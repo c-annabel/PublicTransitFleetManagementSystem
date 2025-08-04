@@ -7,25 +7,25 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .container {
-            width: 350px;
-            margin: 60px auto;
+            width: 400px;
+            height: 450px;
+            margin: 100px auto;
             background: #fff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #ccc;
+            border-radius: 6px;
         }
         h2 {
             color: #003366;
             text-align: center;
-            margin-bottom: 20px;
         }
         input, select {
             width: 100%;
             padding: 10px;
-            margin: 8px 0;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 14px;
+            box-sizing: border-box;
         }
         button {
             width: 100%;
@@ -90,10 +90,10 @@
             <option value="Manager">Manager</option>
             <option value="Operator">Operator</option>
         </select>
-        
+        <br><br>
         <button type="submit">Register</button>
     </form>
-
+    <br>
     <p>Already have an account? <a href="login.jsp">Login here</a></p>
 </div>
 </body>

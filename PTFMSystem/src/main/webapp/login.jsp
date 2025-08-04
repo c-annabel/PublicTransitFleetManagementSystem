@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .container {
-            width: 350px;
-            margin: 80px auto;
+            width: 400px;
+            height: 450px;
+            margin: 100px auto;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 6px;
-            background-color: #f9f9f9;
         }
         h2 {
             color: #003366;
@@ -29,10 +29,10 @@
         input {
             width: 100%;
             padding: 10px;
-            margin: 8px 0;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 14px;
+            box-sizing: border-box;
         }
         button {
             width: 100%;
@@ -74,10 +74,10 @@
     <!-- Login form -->
     <form action="login" method="post">
         <input type="email" name="email" placeholder="Email" required><br>
-        <input type="password" name="password" placeholder="Password" required><br><br>
-        <button type="submit">Login</button><br><br>
+        <input type="password" name="password" placeholder="Password" required><br><br><br>
+        <button type="submit">Login</button>
     </form>
-
+    <br><br>
     <p>
         Don't have an account? <a href="register.jsp">Register here</a>
     </p>
