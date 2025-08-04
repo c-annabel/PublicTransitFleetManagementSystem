@@ -19,6 +19,18 @@ body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+/* Container for forms and content */
+.container_management {
+    width: 80%;
+    height: 90%;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
 /* Headings */
 h2 {
     color: #003366;
@@ -30,6 +42,7 @@ h2 {
 input[type="text"],
 input[type="email"],
 input[type="password"],
+input[type="number"],
 select {
     width: 100%;
     box-sizing: border-box;
@@ -57,6 +70,29 @@ button:hover {
     background-color: #0056b3;
 }
 
+.button-row {
+    display: flex;
+    gap: 50px; /* space between buttons */
+    margin-top: 10px;
+    justify-content: center;
+}
+
+.button-row button {
+    background-color: #007bff;
+    color: #fff;
+    font-size: 14px; /* slightly smaller text */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px 16px; /* smaller padding */
+    flex: 1; /* make them equal width */
+    max-width: 150px; /* optional: limit max size */
+}
+
+.button-row button:hover {
+    background-color: #0056b3;
+}
+
 /* Links */
 a {
     color: #007bff;
@@ -76,4 +112,59 @@ a:hover {
 
 .success {
     color: green;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.form-row label {
+    width: 200px; /* adjust based on your design */
+    font-weight: bold;
+}
+
+.form-row input,
+.form-row select {
+    flex: 1; /* take remaining space */
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse; /* ensures single border, not double */
+    border: 1px solid; /* apply outer border */
+}
+
+.styled-table th,
+.styled-table td {
+    border: 1px solid; /* apply inner cell borders */
+    padding: 8px; /* add spacing inside cells */
+    text-align: left; /* align text */
+}
+
+.message {
+    text-align: center;
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f8d7da; /* Light red for error */
+    color: #721c24;
+}
+
+.message.success {
+    background-color: #d4edda; /* Light green for success */
+    color: #155724;
+}
+
+.footer { 
+    margin-top: 10px;  
+    border-top: 1px solid #eee; 
+    text-align: center; 
+    font-size: 0.9em; 
+    color: #777; 
 }
