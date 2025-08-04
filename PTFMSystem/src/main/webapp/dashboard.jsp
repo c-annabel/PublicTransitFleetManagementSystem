@@ -16,11 +16,13 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .dashboard-container {
-            width: 500px;
-            margin: 50px auto;
-            background: #fff;
+            width: 600px;
+            height: 450px;
+            margin: 100px auto;
+            background: #ffffff;
             padding: 20px;
-            border-radius: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .dashboard-container h2 {
@@ -34,7 +36,7 @@
             text-align: center;
         }
         ul li {
-            margin: 10px 0;
+            margin: 20px 0;
         }
         ul li a {
             display: block;
@@ -70,7 +72,7 @@
     <% } else if ("sessionExpired".equals(error)) { %>
         <div class="message">Session expired. Please log in again.</div>
     <% } %>
-
+    <br>
     <ul>
         <% if ("Manager".equalsIgnoreCase(user.getUserType())) { %>
             <li><a href="vehicleManagement.jsp">Vehicle Management</a></li>
@@ -79,6 +81,7 @@
             <li><a href="viewAssignedRoutes.jsp">My Routes</a></li>
             <li><a href="breakLog.jsp">Break Log</a></li>
         <% } %>
+        <br>
         <li><a href="logout">Logout</a></li>
     </ul>
 </div>
