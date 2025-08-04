@@ -1,0 +1,82 @@
+<%@ page import="transferobjects.User" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // Retrieve user session
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-container {
+            width: 500px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .dashboard-container h2 {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+        }
+        ul li {
+            margin: 10px 0;
+        }
+        ul li a {
+            display: block;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        ul li a:hover {
+            background: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-bottom: 10px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <h2>Welcome, <%= user.getName() %> (<%= user.getUserType() %>)</h2>
+
+    <!-- Display error messages (like unauthorized access) -->
+    <%
+        String error = request.getParameter("error");
+        if ("noaccess".equals(error)) {
+    %>
+        <div class="message">Access Denied: You are not authorized to view that page.</div>
+    <% } %>
+
+    <ul>
+        <% if ("Manager".equalsIgnoreCase(user.getUserType())) { %>
+            <li><a href="vehicleManagement.jsp">Vehicle Management</a></li>
+            <li><a href="maintenance.jsp">Maintenance</a></li>
+        <% } else { %>
+            <li><a href="viewAssignedRoutes.jsp">My Routes</a></li>
+            <li><a href="breakLog.jsp">Break Log</a></li>
+        <% } %>
+        <li><a href="logout">Logout</a></li>
+    </ul>
+</div>
+</body>
+</html>

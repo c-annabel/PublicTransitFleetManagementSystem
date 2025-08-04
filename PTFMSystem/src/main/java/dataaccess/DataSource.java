@@ -1,4 +1,4 @@
-package dataaccesslayer;
+package dataaccess;
 
 import java.io.*;
 import java.sql.Connection;

@@ -1,0 +1,76 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f8ff;
+    color: #003366;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container for forms and content */
+.container {
+    width: 350px;
+    margin: 80px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Headings */
+h2 {
+    color: #003366;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Buttons */
+button {
+    background-color: #007bff;
+    color: #fff;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Links */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Message Alerts */
+.message {
+    text-align: center;
+    margin-bottom: 10px;
+    color: red;
+}
+
+.success {
+    color: green;
+}

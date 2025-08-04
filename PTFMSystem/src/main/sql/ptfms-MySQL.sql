@@ -118,17 +118,17 @@ CREATE TABLE MaintenanceTasks (
 
 -- Users
 INSERT INTO Users (name,email,password,user_type) VALUES
-('Alice Johnson','alice.manager@ptfms.com','hashed_pw','Manager'),
-('Bob Smith','bob.operator@ptfms.com','hashed_pw','Operator'),
-('Charlie Green','charlie.manager@ptfms.com','hashed_pw','Manager'),
-('Julia Roberts','julia.operator@ptfms.com','hashed_pw','Operator'),
-('Kevin Scott','kevin.manager@ptfms.com','hashed_pw','Manager'),
-('George Brown','george.manager@ptfms.com','hashed_pw','Manager'),
-('Hannah White','hannah.operator@ptfms.com','hashed_pw','Operator'),
-('Diana Lopez','diana.operator@ptfms.com','hashed_pw','Operator'),
-('Edward King','edward.manager@ptfms.com','hashed_pw','Manager'),
-('Fiona Adams','fiona.operator@ptfms.com','hashed_pw','Operator'),
-('Laura Evans','laura.operator@ptfms.com','hashed_pw','Operator');
+('Alice Johnson','alice.manager@ptfms.com','cst8288','Manager'),
+('Bob Smith','bob.operator@ptfms.com','cst8288','Operator'),
+('Charlie Green','charlie.manager@ptfms.com','cst8288','Manager'),
+('Julia Roberts','julia.operator@ptfms.com','cst8288','Operator'),
+('Kevin Scott','kevin.manager@ptfms.com','cst8288','Manager'),
+('George Brown','george.manager@ptfms.com','cst8288','Manager'),
+('Hannah White','hannah.operator@ptfms.com','cst8288','Operator'),
+('Diana Lopez','diana.operator@ptfms.com','cst8288','Operator'),
+('Edward King','edward.manager@ptfms.com','cst8288','Manager'),
+('Fiona Adams','fiona.operator@ptfms.com','cst8288','Operator'),
+('Laura Evans','laura.operator@ptfms.com','cst8288','Operator');
 
 -- Routes
 INSERT INTO Routes (route_name,start_point,end_point) VALUES
