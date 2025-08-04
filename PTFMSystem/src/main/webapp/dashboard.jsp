@@ -4,7 +4,7 @@
     // Retrieve user session
     User user = (User) session.getAttribute("user");
     if (user == null) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("login.jsp?error=unauthorized");
         return;
     }
 %>
@@ -38,12 +38,13 @@
         }
         ul li a {
             display: block;
-            padding: 10px;
+            padding: 12px;
             background: #007bff;
             color: #fff;
             text-decoration: none;
             border-radius: 4px;
             font-size: 16px;
+            transition: background 0.3s ease;
         }
         ul li a:hover {
             background: #0056b3;
@@ -52,6 +53,7 @@
             text-align: center;
             margin-bottom: 10px;
             color: red;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -59,12 +61,14 @@
 <div class="dashboard-container">
     <h2>Welcome, <%= user.getName() %> (<%= user.getUserType() %>)</h2>
 
-    <!-- Display error messages (like unauthorized access) -->
+    <!-- Display error messages -->
     <%
         String error = request.getParameter("error");
         if ("noaccess".equals(error)) {
     %>
         <div class="message">Access Denied: You are not authorized to view that page.</div>
+    <% } else if ("sessionExpired".equals(error)) { %>
+        <div class="message">Session expired. Please log in again.</div>
     <% } %>
 
     <ul>

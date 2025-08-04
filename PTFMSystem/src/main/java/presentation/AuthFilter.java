@@ -20,47 +20,54 @@ public class AuthFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+
+        // Get session without creating new
         HttpSession session = req.getSession(false);
 
         String uri = req.getRequestURI();
         boolean loggedIn = (session != null && session.getAttribute("user") != null);
 
-        // Public resources (no authentication needed)
-        boolean isPublicResource = uri.endsWith("login.jsp") ||
-                                   uri.endsWith("register.jsp") ||
+        // Public resources allowed without login
+        boolean isPublicResource = uri.contains("login.jsp") ||
+                                   uri.contains("register.jsp") ||
                                    uri.contains("/login") ||
                                    uri.contains("/register") ||
                                    uri.contains("/css") ||
-                                   uri.contains("/images");
+                                   uri.contains("/images") ||
+                                   uri.endsWith("/");
 
         if (isPublicResource) {
             chain.doFilter(request, response);
             return;
         }
 
+        // If not logged in, redirect to login page
         if (!loggedIn) {
-            // If user is not logged in, redirect to login page
-            res.sendRedirect("login.jsp?error=unauthorized");
+            res.sendRedirect(req.getContextPath() + "/login.jsp?error=unauthorized");
             return;
         }
 
-        // Role-based restriction logic
+        // Safe check for user attribute
         User user = (User) session.getAttribute("user");
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login.jsp?error=sessionExpired");
+            return;
+        }
+
         String userType = user.getUserType();
 
-        // Example: Managers can access everything, Operators restricted
+        // Role-based restriction
         if ("Operator".equalsIgnoreCase(userType) &&
             (uri.contains("vehicleManagement.jsp") || uri.contains("maintenance.jsp"))) {
-            res.sendRedirect("dashboard.jsp?error=noaccess");
+            res.sendRedirect(req.getContextPath() + "/dashboard.jsp?error=noaccess");
             return;
         }
 
-        // Prevent browser caching of restricted pages (security after logout)
+        // Prevent browser caching of restricted pages
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         res.setHeader("Pragma", "no-cache");
         res.setDateHeader("Expires", 0);
 
-        // Continue filter chain
         chain.doFilter(request, response);
     }
 }
