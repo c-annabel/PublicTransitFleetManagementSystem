@@ -94,7 +94,7 @@
         <button type="submit">Register</button>
     </form>
 
-    <p><a href="login.jsp">Already have an account? Login here</a></p>
+    <p>Already have an account? <a href="login.jsp">Login here</a></p>
 </div>
 </body>
 </html>
