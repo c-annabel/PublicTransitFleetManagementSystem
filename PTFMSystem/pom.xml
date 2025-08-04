@@ -20,7 +20,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.31</version> <!-- Use a version compatible with your MySQL server and Java -->
+            <version>8.0.31</version> <!-- Use a version compatible with MySQL server and Java -->
         </dependency>
         <dependency>
             <groupId>jakarta.platform</groupId>
