@@ -113,7 +113,20 @@ CREATE TABLE MaintenanceTasks (
 );
 
 -- ===========================
--- 10. SAMPLE DATA
+-- 10. BREAK LOGS (FR-03)
+-- ===========================
+CREATE TABLE BreakLogs (
+    break_id INT AUTO_INCREMENT PRIMARY KEY,
+    vehicle_id INT NOT NULL,
+    operator_id INT NOT NULL,
+    start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    end_time TIMESTAMP NULL,
+    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
+    FOREIGN KEY (operator_id) REFERENCES Users(user_id)
+);
+
+-- ===========================
+-- 11. SAMPLE DATA
 -- ===========================
 
 -- Users
@@ -244,6 +257,20 @@ INSERT INTO MaintenanceTasks (vehicle_id, description, scheduled_date) VALUES
 (8,'Clean Fuel Injectors','2025-08-23'),
 (9,'Lubricate Axle Bearings','2025-08-25'),
 (10,'Run Brake Diagnostics','2025-08-27');
+
+-- Break Logs
+INSERT INTO BreakLogs (vehicle_id, operator_id, start_time, end_time) VALUES
+(1, 2, '2025-08-04 08:30:00', '2025-08-04 09:00:00'),  -- Bob on BUS101
+(2, 4, '2025-08-04 10:15:00', '2025-08-04 10:45:00'),  -- Julia on LRT201
+(3, 8, '2025-08-04 11:00:00', '2025-08-04 11:20:00'),  -- Diana on TRAIN301
+(4, 10, '2025-08-04 13:00:00', '2025-08-04 13:30:00'), -- Fiona on BUS102
+(5, 2, '2025-08-04 14:10:00', '2025-08-04 14:40:00'),  -- Bob again on BUS103
+(6, 4, '2025-08-04 15:00:00', '2025-08-04 15:30:00'),  -- Julia on LRT202
+(7, 7, '2025-08-04 16:20:00', '2025-08-04 16:50:00'),  -- Hannah on LRT203
+(8, 8, '2025-08-04 17:10:00', '2025-08-04 17:40:00'),  -- Diana on TRAIN302
+(9, 10, '2025-08-04 18:00:00', '2025-08-04 18:25:00'), -- Fiona on TRAIN303
+(10, 11, '2025-08-04 19:30:00', '2025-08-04 20:00:00');-- Laura on BUS104
+
 
 -- Enable foreign key checks after all inserts. Avoid constraint error during bulk inserts. 
 SET FOREIGN_KEY_CHECKS=1;
