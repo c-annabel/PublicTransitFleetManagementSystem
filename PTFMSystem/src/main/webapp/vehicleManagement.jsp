@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+    <p style="margin-top: 15px; text-align:center;">
+        <a href="dashboard.jsp" class="back-btn">← Back to Dashboard</a>
+    </p>
+
 <div class="container_management">
     <h2>Vehicle Management</h2>
 

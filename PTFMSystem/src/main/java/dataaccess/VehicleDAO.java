@@ -25,22 +25,21 @@ public class VehicleDAO {
             ps.executeUpdate();
         }
     }
-    
-    
+
     public void updateVehicle(Vehicle vehicle) throws SQLException {
-    String sql = "UPDATE Vehicles SET vehicle_number=?, vehicle_type=?, fuel_type=?, consumption_rate=?, max_passengers=?, route_id=? WHERE vehicle_id=?";
-    try (Connection con = dataSource.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setString(1, vehicle.getVehicleNumber());
-        ps.setString(2, vehicle.getVehicleType());
-        ps.setString(3, vehicle.getFuelType());
-        ps.setDouble(4, vehicle.getConsumptionRate());
-        ps.setInt(5, vehicle.getMaxPassengers());
-        ps.setInt(6, vehicle.getRouteId());
-        ps.setInt(7, vehicle.getVehicleId());
-        ps.executeUpdate();
+        String sql = "UPDATE Vehicles SET vehicle_number=?, vehicle_type=?, fuel_type=?, consumption_rate=?, max_passengers=?, route_id=? WHERE vehicle_id=?";
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, vehicle.getVehicleNumber());
+            ps.setString(2, vehicle.getVehicleType());
+            ps.setString(3, vehicle.getFuelType());
+            ps.setDouble(4, vehicle.getConsumptionRate());
+            ps.setInt(5, vehicle.getMaxPassengers());
+            ps.setInt(6, vehicle.getRouteId());
+            ps.setInt(7, vehicle.getVehicleId());
+            ps.executeUpdate();
+        }
     }
-}
 
     public void deleteVehicle(int vehicleId) throws SQLException {
         String sql = "DELETE FROM Vehicles WHERE vehicle_id=?";
@@ -57,16 +56,18 @@ public class VehicleDAO {
         try (Connection con = dataSource.getConnection();
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
-                Vehicle v = new Vehicle();
-                v.setVehicleId(rs.getInt("vehicle_id"));
-                v.setVehicleNumber(rs.getString("vehicle_number"));
-                v.setVehicleType(rs.getString("vehicle_type"));
-                v.setFuelType(rs.getString("fuel_type"));
-                v.setConsumptionRate(rs.getDouble("consumption_rate"));
-                v.setMaxPassengers(rs.getInt("max_passengers"));
-                v.setRouteId(rs.getInt("route_id"));
-                list.add(v);
+                Vehicle vehicle = new Vehicle.Builder()
+                        .vehicleId(rs.getInt("vehicle_id"))
+                        .vehicleNumber(rs.getString("vehicle_number"))
+                        .vehicleType(rs.getString("vehicle_type"))
+                        .fuelType(rs.getString("fuel_type"))
+                        .consumptionRate(rs.getDouble("consumption_rate"))
+                        .maxPassengers(rs.getInt("max_passengers"))
+                        .routeId(rs.getInt("route_id"))
+                        .build();
+                list.add(vehicle);
             }
         }
         return list;
