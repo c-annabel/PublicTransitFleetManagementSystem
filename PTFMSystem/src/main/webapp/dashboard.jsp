@@ -84,6 +84,7 @@
             <li><a href="viewAssignedRoutes.jsp">My Routes</a></li>
             <li><a href="breakLog.jsp">Break Log</a></li>
             <li><a href="gpsOperator.jsp" class="btn">GPS Logging</a></li>
+            <li><a href="reports.jsp?view=performance">Performance</a></li>
 
         <% } %>
         
