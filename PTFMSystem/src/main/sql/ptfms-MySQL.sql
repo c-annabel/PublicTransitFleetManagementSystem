@@ -135,13 +135,16 @@ CREATE TABLE DiagnosticsLogs (
     diag_id INT AUTO_INCREMENT PRIMARY KEY,
     vehicle_id INT NOT NULL,
     log_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    engine_health DECIMAL(5,2),
-    catenary_condition DECIMAL(5,2),
-    pantograph_condition DECIMAL(5,2),
-    circuit_breaker_condition DECIMAL(5,2),
+    engine_hours INT DEFAULT 0,
+    brake_hours INT DEFAULT 0,
+    wheel_hours INT DEFAULT 0,
+    engine_health DECIMAL(5,2),           -- e.g., 0-100%
+    catenary_condition DECIMAL(5,2),      -- e.g., 0-100%
+    pantograph_condition DECIMAL(5,2),    -- e.g., 0-100%
+    circuit_breaker_condition DECIMAL(5,2), -- e.g., 0-100%
+    axle_condition DECIMAL(5,2),          -- e.g., 0-100%
     FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
 );
-
 -- ===========================
 -- 12. ALERTS
 -- ===========================
@@ -281,16 +284,31 @@ INSERT INTO RouteStations (route_id,station_id,stop_order) VALUES
 
 -- Vehicles
 INSERT INTO Vehicles (vehicle_number,vehicle_type,fuel_type,consumption_rate,max_passengers,route_id) VALUES
+-- Existing Diesel Buses
 ('BUS101','Diesel Bus','Diesel',30.5,50,1),
-('LRT201','Electric Light Rail','Electric',15.0,200,2),
+('BUS102','Diesel Bus','Diesel',28.7,48,2),
+('BUS103','Diesel Bus','Diesel',31.2,52,3),
+('BUS104','Diesel Bus','Diesel',29.9,50,6),
+('BUS105','Diesel Bus','Diesel',32.1,49,7),
+
+-- Diesel-Electric Trains
 ('TRAIN301','Diesel-Electric Train','Diesel-Electric',50.0,500,1),
-('BUS102','Diesel Bus','Diesel',28.7,48,2),     -- Another bus on Route B
-('BUS103','Diesel Bus','Diesel',31.2,52,3),     -- Bus on Route C
-('LRT202','Electric Light Rail','Electric',14.5,210,3), -- LRT for Route C
-('LRT203','Electric Light Rail','Electric',15.2,200,4), -- LRT for Route D
-('TRAIN302','Diesel-Electric Train','Diesel-Electric',49.8,510,4), -- Train for Route D
-('TRAIN303','Diesel-Electric Train','Diesel-Electric',52.0,495,5), -- Train for Route E
-('BUS104','Diesel Bus','Diesel',29.9,50,6);     -- Bus for Route F;
+('TRAIN302','Diesel-Electric Train','Diesel-Electric',49.8,510,4),
+('TRAIN303','Diesel-Electric Train','Diesel-Electric',52.0,495,5),
+('TRAIN304','Diesel-Electric Train','Diesel-Electric',51.3,505,6),
+('TRAIN305','Diesel-Electric Train','Diesel-Electric',50.7,498,7),
+
+-- Electric Light Rail
+('LRT201','Electric Light Rail','Electric',15.0,200,2),
+('LRT202','Electric Light Rail','Electric',14.5,210,3),
+('LRT203','Electric Light Rail','Electric',15.2,200,4),
+('LRT204','Electric Light Rail','Electric',14.8,205,5),
+('LRT205','Electric Light Rail','Electric',15.1,198,6),
+('LRT206','Electric Light Rail','Electric',14.9,202,7),
+('LRT207','Electric Light Rail','Electric',15.3,199,8),
+('LRT208','Electric Light Rail','Electric',14.7,201,9),
+('LRT209','Electric Light Rail','Electric',15.4,203,10),
+('LRT210','Electric Light Rail','Electric',15.0,204,11);
 
 -- GPS Logs
 INSERT INTO GPSLogs (vehicle_id, station_id, arrival_time, departure_time) VALUES
@@ -395,17 +413,43 @@ INSERT INTO UsageLogs (vehicle_id, hours_used, brake_condition, tire_condition, 
 (10,7.5, 89.0, 90.0, 88.0, '2025-07-24 09:05:00');
 
 -- DiagnosticsLogs (10 entries)
-INSERT INTO DiagnosticsLogs (vehicle_id, engine_health, catenary_condition, pantograph_condition, circuit_breaker_condition, log_datetime) VALUES
+INSERT INTO DiagnosticsLogs (vehicle_id, engine_health, catenary_condition, pantograph_condition, circuit_breaker_condition, log_datetime)
+VALUES
+-- Diesel Buses (1–5)
 (1, 92.0, NULL, NULL, NULL, '2025-07-15 10:10:00'),
-(2, NULL, 94.0, 96.0, 95.0, '2025-07-16 11:10:00'),
-(3, 82.0, NULL, NULL, NULL, '2025-07-17 12:10:00'),
-(4, 88.0, NULL, NULL, NULL, '2025-07-18 09:40:00'),
-(5, 86.0, NULL, NULL, NULL, '2025-07-19 10:10:00'),
-(6, NULL, 97.0, 98.0, 96.0, '2025-07-20 11:10:00'),
-(7, NULL, 95.0, 94.0, 96.0, '2025-07-21 12:10:00'),
-(8, 78.0, NULL, NULL, NULL, '2025-07-22 13:10:00'),
-(9, 75.0, NULL, NULL, NULL, '2025-07-23 08:10:00'),
-(10,90.0, NULL, NULL, NULL, '2025-07-24 09:10:00');
+(1, 91.6, NULL, NULL, NULL, '2025-07-20 10:10:00'),
+(2, 94.0, NULL, NULL, NULL, '2025-07-15 11:10:00'),
+(2, 93.5, NULL, NULL, NULL, '2025-07-22 11:10:00'),
+(3, 88.0, NULL, NULL, NULL, '2025-07-16 12:10:00'),
+(3, 87.5, NULL, NULL, NULL, '2025-07-23 12:10:00'),
+(4, 86.0, NULL, NULL, NULL, '2025-07-17 09:40:00'),
+(4, 85.4, NULL, NULL, NULL, '2025-07-24 09:40:00'),
+(5, 84.0, NULL, NULL, NULL, '2025-07-18 10:10:00'),
+(5, 83.5, NULL, NULL, NULL, '2025-07-25 10:10:00'),
+
+-- Diesel-Electric Trains (6–10)
+(6, 93.0, 97.0, 96.0, 97.0, '2025-07-15 10:20:00'),
+(6, 92.7, 96.6, 95.7, 96.7, '2025-07-22 10:20:00'),
+(7, 91.0, 95.0, 94.0, 95.0, '2025-07-16 11:20:00'),
+(7, 90.6, 94.7, 93.6, 94.6, '2025-07-23 11:20:00'),
+(8, 89.0, 93.0, 92.0, 93.0, '2025-07-17 12:20:00'),
+(8, 88.5, 92.6, 91.6, 92.6, '2025-07-24 12:20:00'),
+(9, 87.0, 91.0, 90.0, 91.0, '2025-07-18 09:50:00'),
+(9, 86.6, 90.6, 89.6, 90.6, '2025-07-25 09:50:00'),
+(10, 85.0, 89.0, 88.0, 89.0, '2025-07-19 10:20:00'),
+(10, 84.5, 88.6, 87.6, 88.6, '2025-07-26 10:20:00'),
+
+-- Electric Light Rail (11–20)
+(11, NULL, 95.0, 94.0, 95.0, '2025-07-15 10:25:00'),
+(11, NULL, 94.6, 93.6, 94.6, '2025-07-23 10:25:00'),
+(12, NULL, 93.0, 92.0, 93.0, '2025-07-16 11:25:00'),
+(12, NULL, 92.5, 91.5, 92.6, '2025-07-24 11:25:00'),
+(13, NULL, 91.0, 90.0, 91.0, '2025-07-17 12:25:00'),
+(14, NULL, 89.0, 88.0, 89.0, '2025-07-18 09:55:00'),
+(15, NULL, 87.0, 86.0, 87.0, '2025-07-19 10:25:00'),
+(16, NULL, 85.0, 84.0, 85.0, '2025-07-20 11:25:00'),
+(17, NULL, 83.0, 82.0, 83.0, '2025-07-21 12:25:00'),
+(18, NULL, 81.0, 80.0, 81.0, '2025-07-22 13:25:00');
 
 -- Alerts (10 entries: updated dates and threshold logic)
 INSERT INTO Alerts (vehicle_id, alert_type, alert_message, consumption_value, threshold, severity, generated_at) VALUES
