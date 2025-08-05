@@ -167,10 +167,46 @@ CREATE TABLE MaintenanceTasks (
     alert_id INT,
     description VARCHAR(255) NOT NULL,
     scheduled_datetime DATETIME NOT NULL,
+    cost DECIMAL(10,2) DEFAULT 0.00,
     completed BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
     FOREIGN KEY (alert_id) REFERENCES Alerts(alert_id),
     UNIQUE(vehicle_id, scheduled_datetime)
+);
+
+-- ===========================
+-- 14. TRIP SCHEDULES
+-- ===========================
+CREATE TABLE TripSchedules (
+    schedule_id INT AUTO_INCREMENT PRIMARY KEY,
+    route_id INT NOT NULL,
+    station_id INT NOT NULL,
+    planned_arrival_time DATETIME NOT NULL,
+    FOREIGN KEY (route_id) REFERENCES Routes(route_id),
+    FOREIGN KEY (station_id) REFERENCES Stations(station_id)
+);
+
+-- ===========================
+-- 15. OPERATOR ASSIGNMENTS
+-- ===========================
+CREATE TABLE OperatorAssignments (
+    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+    operator_id INT NOT NULL,
+    vehicle_id INT NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME,
+    FOREIGN KEY (operator_id) REFERENCES Users(user_id),
+    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
+);
+
+-- ===========================
+-- 16. OPERATOR ASSIGNMENTS
+-- ===========================
+CREATE TABLE PriceConfig (
+    config_id INT AUTO_INCREMENT PRIMARY KEY,
+    fuel_type VARCHAR(50),
+    price_per_unit DECIMAL(10,2),
+    effective_date DATE
 );
 
 -- ===========================
@@ -386,17 +422,53 @@ INSERT INTO Alerts (vehicle_id, alert_type, alert_message, consumption_value, th
 
 
 -- MaintenanceTasks (linked to alerts)
-INSERT INTO MaintenanceTasks (vehicle_id, alert_id, description, scheduled_datetime, completed) VALUES
-(1,1,'Inspect fuel system','2025-08-25 09:00:00',FALSE),
-(2,2,'Check LRT electrical systems','2025-08-26 10:00:00',FALSE),
-(3,3,'Engine overhaul','2025-08-27 11:00:00',FALSE),
-(4,4,'Replace brake pads','2025-08-28 09:00:00',FALSE),
-(5,5,'Engine diagnostics','2025-08-29 10:00:00',FALSE),
-(6,6,'Energy optimization check','2025-08-30 13:00:00',FALSE),
-(7,7,'Inspect pantograph','2025-08-31 14:00:00',FALSE),
-(8,8,'Engine tune-up','2025-09-01 15:00:00',FALSE),
-(9,9,'Fuel system calibration','2025-09-02 16:00:00',FALSE),
-(10,10,'Brake system overhaul','2025-09-03 17:00:00',FALSE);
+INSERT INTO MaintenanceTasks (vehicle_id, alert_id, description, scheduled_datetime, cost, completed) VALUES
+(1,1,'Inspect fuel system','2025-08-25 09:00:00',750.00,FALSE),
+(2,2,'Check LRT electrical systems','2025-08-26 10:00:00',1200.00,FALSE),
+(3,3,'Engine overhaul','2025-08-27 11:00:00',1800.00,FALSE),
+(4,4,'Replace brake pads','2025-08-28 09:00:00',950.00,FALSE),
+(5,5,'Engine diagnostics','2025-08-29 10:00:00',1100.00,FALSE),
+(6,6,'Energy optimization check','2025-08-30 13:00:00',1300.00,FALSE),
+(7,7,'Inspect pantograph','2025-08-31 14:00:00',1600.00,FALSE),
+(8,8,'Engine tune-up','2025-09-01 15:00:00',1750.00,FALSE),
+(9,9,'Fuel system calibration','2025-09-02 16:00:00',1400.00,FALSE),
+(10,10,'Brake system overhaul','2025-09-03 17:00:00',900.00,FALSE);
+
+INSERT INTO TripSchedules (route_id, station_id, planned_arrival_time) VALUES
+(1, 1, '2025-07-15 08:00:00'),
+(1, 2, '2025-07-15 08:20:00'),
+(2, 3, '2025-07-16 10:15:00'),
+(2, 4, '2025-07-16 10:30:00'),
+(2,14, '2025-07-16 10:40:00'),
+(3, 4, '2025-07-20 09:00:00'),
+(3, 5, '2025-07-20 09:15:00'),
+(3, 6, '2025-07-20 09:25:00'),
+(4, 7, '2025-07-19 13:00:00'),
+(4, 8, '2025-07-19 13:15:00');
+
+INSERT INTO OperatorAssignments (operator_id, vehicle_id, start_time, end_time) VALUES
+(2, 1, '2025-07-15 07:50:00', '2025-07-15 09:00:00'),
+(4, 2, '2025-07-16 10:10:00', '2025-07-16 11:30:00'),
+(8, 3, '2025-07-17 09:00:00', '2025-07-17 10:00:00'),
+(10,4, '2025-07-19 12:50:00', '2025-07-19 14:00:00'),
+(12,5, '2025-07-20 08:50:00', '2025-07-20 10:00:00'),
+(7, 6, '2025-07-21 11:30:00', '2025-07-21 12:40:00'),
+(2, 7, '2025-07-22 13:00:00', '2025-07-22 14:15:00'),
+(4, 8, '2025-07-23 07:50:00', '2025-07-23 09:15:00'),
+(8, 9, '2025-07-24 08:10:00', '2025-07-24 09:30:00'),
+(10,10,'2025-07-25 14:00:00', '2025-07-25 15:15:00');
+
+INSERT INTO PriceConfig (fuel_type, price_per_unit, effective_date) VALUES
+('Diesel', 1.45, '2025-01-01'),
+('Diesel', 1.50, '2025-04-01'),
+('Diesel', 1.55, '2025-07-01'),
+('Electric', 0.18, '2025-01-01'),
+('Electric', 0.20, '2025-04-01'),
+('Electric', 0.22, '2025-07-01'),
+('Diesel-Electric', 1.60, '2025-01-01'),
+('Diesel-Electric', 1.65, '2025-04-01'),
+('Diesel-Electric', 1.70, '2025-07-01'),
+('Biofuel', 1.80, '2025-07-01'); -- Optional fuel type for expansion
 
 
 -- Enable foreign key checks after all inserts. Avoid constraint error during bulk inserts. 
