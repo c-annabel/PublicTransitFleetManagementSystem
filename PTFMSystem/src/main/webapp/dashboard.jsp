@@ -17,7 +17,7 @@
     <style>
         .dashboard-container {
             width: 600px;
-            height: 450px;
+            height: 600px;
             margin: 100px auto;
             background: #ffffff;
             padding: 20px;
@@ -77,11 +77,14 @@
         <% if ("Manager".equalsIgnoreCase(user.getUserType())) { %>
             <li><a href="vehicleManagement.jsp">Vehicle Management</a></li>
             <li><a href="gpsOperator.jsp">GPS Tracking Report</a></li>
-            <li><a href="maintenance.jsp">Maintenance</a></li>
+            <li><a href="monitoring.jsp">Monitoring</a></li>
+            <li><a href="alertsMaintenance.jsp">Alerts & Maintenance</a></li>
+            <li><a href="reports.jsp">Reports</a></li>
         <% } else { %>
             <li><a href="viewAssignedRoutes.jsp">My Routes</a></li>
             <li><a href="breakLog.jsp">Break Log</a></li>
             <li><a href="gpsOperator.jsp" class="btn">GPS Logging</a></li>
+            <li><a href="reports.jsp?view=performance">Performance</a></li>
 
         <% } %>
         
