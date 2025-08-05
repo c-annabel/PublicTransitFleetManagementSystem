@@ -121,6 +121,7 @@ CREATE TABLE BreakLogs (
     operator_id INT NOT NULL,
     start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     end_time TIMESTAMP NULL,
+    status ENUM('Started', 'Paused', 'Ended') DEFAULT 'Started',
     FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
     FOREIGN KEY (operator_id) REFERENCES Users(user_id)
 );
@@ -259,17 +260,37 @@ INSERT INTO MaintenanceTasks (vehicle_id, description, scheduled_date) VALUES
 (10,'Run Brake Diagnostics','2025-08-27');
 
 -- Break Logs
-INSERT INTO BreakLogs (vehicle_id, operator_id, start_time, end_time) VALUES
-(1, 2, '2025-08-04 08:30:00', '2025-08-04 09:00:00'),  -- Bob on BUS101
-(2, 4, '2025-08-04 10:15:00', '2025-08-04 10:45:00'),  -- Julia on LRT201
-(3, 8, '2025-08-04 11:00:00', '2025-08-04 11:20:00'),  -- Diana on TRAIN301
-(4, 10, '2025-08-04 13:00:00', '2025-08-04 13:30:00'), -- Fiona on BUS102
-(5, 2, '2025-08-04 14:10:00', '2025-08-04 14:40:00'),  -- Bob again on BUS103
-(6, 4, '2025-08-04 15:00:00', '2025-08-04 15:30:00'),  -- Julia on LRT202
-(7, 7, '2025-08-04 16:20:00', '2025-08-04 16:50:00'),  -- Hannah on LRT203
-(8, 8, '2025-08-04 17:10:00', '2025-08-04 17:40:00'),  -- Diana on TRAIN302
-(9, 10, '2025-08-04 18:00:00', '2025-08-04 18:25:00'), -- Fiona on TRAIN303
-(10, 11, '2025-08-04 19:30:00', '2025-08-04 20:00:00');-- Laura on BUS104
+INSERT INTO BreakLogs (vehicle_id, operator_id, start_time, end_time, status) VALUES
+-- Operator 2 (Bob)
+(1, 2, '2025-07-15 08:00:00', '2025-07-15 08:30:00', 'Ended'),
+(5, 2, '2025-07-20 09:00:00', '2025-07-20 09:25:00', 'Ended'),
+
+-- Operator 4 (Julia)
+(2, 4, '2025-07-16 10:15:00', '2025-07-16 10:40:00', 'Ended'),
+(6, 4, '2025-07-25 14:00:00', '2025-07-25 14:30:00', 'Ended'),
+
+-- Operator 7 (Hannah)
+(7, 7, '2025-07-18 11:00:00', '2025-07-18 11:30:00', 'Ended'),
+(7, 7, '2025-07-26 15:15:00', '2025-07-26 15:40:00', 'Ended'),
+
+-- Operator 8 (Diana)
+(3, 8, '2025-07-17 09:10:00', '2025-07-17 09:40:00', 'Ended'),
+(8, 8, '2025-07-30 16:00:00', '2025-07-30 16:30:00', 'Ended'),
+
+-- Operator 10 (Fiona)
+(4, 10, '2025-07-19 13:00:00', '2025-07-19 13:25:00', 'Ended'),
+(9, 10, '2025-07-28 17:10:00', '2025-07-28 17:40:00', 'Ended'),
+
+-- Operator 11 (Laura)
+(10, 11, '2025-07-21 14:20:00', '2025-07-21 14:50:00', 'Ended'),
+
+-- Operator 12 (Operator - 5 logs)
+(1, 12, '2025-07-22 08:30:00', '2025-07-22 09:00:00', 'Ended'),
+(2, 12, '2025-07-24 10:00:00', '2025-07-24 10:25:00', 'Ended'),
+(3, 12, '2025-07-27 09:15:00', '2025-07-27 09:45:00', 'Ended'),
+(4, 12, '2025-07-29 11:30:00', '2025-07-29 12:00:00', 'Ended'),
+(5, 12, '2025-08-03 14:20:00', '2025-08-03 14:50:00', 'Ended');
+
 
 
 -- Enable foreign key checks after all inserts. Avoid constraint error during bulk inserts. 

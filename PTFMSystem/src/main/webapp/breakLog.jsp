@@ -1,4 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*, transferobjects.BreakLog, business.BreakLogService, transferobjects.User" %>
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null || !"Operator".equalsIgnoreCase(user.getUserType())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    BreakLogService breakLogService = new BreakLogService();
+    List<BreakLog> logs = new ArrayList<>();
+    try {
+        logs = breakLogService.getBreakLogs(user.getUserId());
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,25 +22,34 @@
     <title>Break Log</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .container {
-            width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            background-color: #f9f9f9;
-        }
-        h2 {
-            color: #003366;
-            text-align: center;
-        }
-        .message {
-            text-align: center;
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
             margin-bottom: 10px;
-            color: red;
         }
-        .success {
-            color: green;
+        .row label {
+            width: 130px;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        .row input {
+            width: 200px;
+            padding: 8px;
+            flex: 1;
+        }
+        .row button {
+            width: 200px;
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .row button:hover {
+            background-color: #0056b3;
         }
         table {
             width: 100%;
@@ -43,52 +68,106 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-        .back-link {
-            display: inline-block;
-            margin-top: 15px;
-            text-decoration: none;
-            background: #007bff;
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 4px;
+        .message {
+          text-align: center;
+          margin: 10px 0;
+          padding: 8px;
+          border-radius: 4px;
         }
-        .back-link:hover {
-            background: #0056b3;
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="container_management">
     <h2>Break Log</h2>
 
-    <!-- Display message if present -->
+    <!-- Display feedback messages -->
     <%
-        String message = request.getParameter("msg");
-        if (message != null && !message.trim().isEmpty()) {
+        String msg = request.getParameter("msg");
+        String type = request.getParameter("type");
+        if (msg != null && !msg.isEmpty()) {
+        
+        String cssClass = "message";
+        if ("success".equals(type)) {
+            cssClass += " success";
+        } else if ("error".equals(type)) {
+            cssClass += " error";
+        }
     %>
-        <div class="message success"><%= message %></div>
+        <div class="<%= cssClass %>">
+            <%= msg %>
+        </div>
     <% } %>
 
-    <!-- Break Log Table -->
+    <!-- Break Action Form -->
+    <form action="breakAction" method="post">
+        <input type="hidden" name="operatorId" value="<%= user.getUserId() %>">
+
+        <!-- Row 1: Vehicle ID and Start Break -->
+        <div class="row">
+            <label for="vehicleId">Vehicle ID:</label>
+            <input type="number" id="vehicleId" name="vehicleId">
+            <button type="submit" name="action" value="start">Start Break</button>
+        </div>
+
+        <!-- Row 2: Break ID and Pause/End Break -->
+        <div class="row">
+            <label for="breakId">Break ID:</label>
+            <input type="number" id="breakId" name="breakId">
+            <button type="submit" name="action" value="pause">Pause Break</button>
+            <button type="submit" name="action" value="end">End Break</button>
+        </div>
+    </form>
+        <br><br>
+    <!-- Break Logs Table -->
+    <h3>Your Break Logs</h3>
     <table>
         <thead>
             <tr>
-                <th>Log ID</th>
+                <th>Break ID</th>
                 <th>Vehicle ID</th>
                 <th>Start Time</th>
                 <th>End Time</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
+        <%
+            if (logs != null && !logs.isEmpty()) {
+                for (BreakLog log : logs) {
+        %>
             <tr>
-                <td colspan="4">No break logs available yet.</td>
+                <td><%= log.getBreakId() %></td>
+                <td><%= log.getVehicleId() %></td>
+                <td><%= log.getStartTime() %></td>
+                <td><%= (log.getEndTime() != null ? log.getEndTime() : "-") %></td>
+                <td><%= log.getStatus() %></td>
             </tr>
+        <%
+                }
+            } else {
+        %>
+            <tr>
+                <td colspan="5">No break logs available.</td>
+            </tr>
+        <%
+            }
+        %>
         </tbody>
     </table>
 
-    <!-- Navigation -->
-    <p style="text-align:center;">
-        <a href="dashboard.jsp" class="back-link">Back to Dashboard</a>
+    <!-- Back Button -->
+    <p style="text-align:center; margin-top:20px;">
+        <a href="dashboard.jsp" class="back-btn">Back to Dashboard</a>
     </p>
 </div>
 </body>
