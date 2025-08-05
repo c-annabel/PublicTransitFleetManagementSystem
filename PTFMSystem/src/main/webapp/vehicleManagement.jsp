@@ -9,11 +9,10 @@
 </head>
 <body>
 
-    <p style="margin-top: 15px; text-align:center;">
-        <a href="dashboard.jsp" class="back-btn">← Back to Dashboard</a>
-    </p>
-
 <div class="container_management">
+    <div style="text-align:right; margin-bottom:10px;">
+        <a href="dashboard.jsp" class="back-btn">Back to Dashboard</a>
+    </div>
     <h2>Vehicle Management</h2>
 
     <!-- ✅ Feedback Messages -->
