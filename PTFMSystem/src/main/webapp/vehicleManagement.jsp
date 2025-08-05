@@ -123,6 +123,7 @@ function selectVehicle(id, number, type, fuel, rate, passengers, route) {
 }
 </script>
 
+</body>
 <footer>
     <div class="footer">
         <p>Developed by: Annabel Cheng &copy; 2025</p>
@@ -130,5 +131,5 @@ function selectVehicle(id, number, type, fuel, rate, passengers, route) {
     </div>
     <br><br>
 </footer>
-</body>
+
 </html>

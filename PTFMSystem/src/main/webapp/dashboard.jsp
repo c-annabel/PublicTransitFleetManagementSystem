@@ -76,13 +76,16 @@
     <ul>
         <% if ("Manager".equalsIgnoreCase(user.getUserType())) { %>
             <li><a href="vehicleManagement.jsp">Vehicle Management</a></li>
+            <li><a href="gpsOperator.jsp">GPS Tracking Report</a></li>
             <li><a href="maintenance.jsp">Maintenance</a></li>
         <% } else { %>
             <li><a href="viewAssignedRoutes.jsp">My Routes</a></li>
             <li><a href="breakLog.jsp">Break Log</a></li>
+            <li><a href="gpsOperator.jsp" class="btn">GPS Logging</a></li>
+
         <% } %>
-        <br>
-        <li><a href="logout">Logout</a></li>
+        
+        <li><br><a href="logout">Logout</a></li>
     </ul>
 </div>
 </body>

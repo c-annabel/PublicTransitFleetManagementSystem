@@ -49,6 +49,25 @@ public class VehicleDAO {
             ps.executeUpdate();
         }
     }
+    
+    public List<String[]> getVehicleIdAndNumber() throws SQLException {
+        String sql = "SELECT vehicle_id, vehicle_number FROM Vehicles";
+        List<String[]> list = new ArrayList<>();
+
+        try (Connection con = dataSource.getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(new String[]{
+                    String.valueOf(rs.getInt("vehicle_id")),
+                    rs.getString("vehicle_number")
+                });
+            }
+        }
+        return list;
+    }
+
+
 
     public List<Vehicle> getAllVehicles() throws SQLException {
         List<Vehicle> list = new ArrayList<>();

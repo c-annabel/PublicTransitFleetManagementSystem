@@ -88,6 +88,10 @@
 </head>
 <body>
 <div class="container_management">
+    <!-- Back Button -->
+    <div style="text-align:right; margin-bottom:10px;">
+        <a href="dashboard.jsp" class="back-btn">Back to Dashboard</a>
+    </div>
     <h2>Break Log</h2>
 
     <!-- Display feedback messages -->
@@ -165,10 +169,13 @@
         </tbody>
     </table>
 
-    <!-- Back Button -->
-    <p style="text-align:center; margin-top:20px;">
-        <a href="dashboard.jsp" class="back-btn">Back to Dashboard</a>
-    </p>
 </div>
 </body>
+<footer>
+    <div class="footer">
+        <p>Developed by: Annabel Cheng &copy; 2025</p>
+        <p>25S CST8288 Section 013 Final Project</p>
+    </div>
+    <br><br>
+</footer>
 </html>

@@ -69,11 +69,11 @@ CREATE TABLE Vehicles (
 CREATE TABLE GPSLogs (
     gps_id INT AUTO_INCREMENT PRIMARY KEY,
     vehicle_id INT NOT NULL,
-    latitude DECIMAL(9,6),
-    longitude DECIMAL(9,6),
-    log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('In-Service','Break','Out-of-Service') DEFAULT 'In-Service',
-    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
+    station_id INT NOT NULL,
+    arrival_time DATETIME NOT NULL,
+    departure_time DATETIME NULL,
+    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
+    FOREIGN KEY (station_id) REFERENCES Stations(station_id)
 );
 
 -- ===========================
@@ -142,7 +142,9 @@ INSERT INTO Users (name,email,password,user_type) VALUES
 ('Diana Lopez','diana.operator@ptfms.com','cst8288','Operator'),
 ('Edward King','edward.manager@ptfms.com','cst8288','Manager'),
 ('Fiona Adams','fiona.operator@ptfms.com','cst8288','Operator'),
-('Laura Evans','laura.operator@ptfms.com','cst8288','Operator');
+('Laura Evans','laura.operator@ptfms.com','cst8288','Operator'),
+('Operator', 'op@algonquin.com', 'cst8288', 'Operator'),
+('Transit Manager', 'tm@algonquin.com', 'cst8288', 'Manager');
 
 -- Routes
 INSERT INTO Routes (route_name,start_point,end_point) VALUES
@@ -208,17 +210,42 @@ INSERT INTO Vehicles (vehicle_number,vehicle_type,fuel_type,consumption_rate,max
 ('BUS104','Diesel Bus','Diesel',29.9,50,6);     -- Bus for Route F;
 
 -- GPS Logs
-INSERT INTO GPSLogs (vehicle_id, latitude, longitude, status) VALUES
-(1,45.4215,-75.6972,'In-Service'),
-(2,45.4245,-75.6950,'Break'),
-(3,45.4250,-75.6930,'In-Service'),
-(4,45.4300,-75.6890,'In-Service'),
-(5,45.4350,-75.6845,'Break'),
-(6,45.4400,-75.6800,'In-Service'),
-(7,45.4455,-75.6755,'Out-of-Service'),
-(8,45.4500,-75.6700,'In-Service'),
-(9,45.4555,-75.6655,'Break'),
-(10,45.4600,-75.6600,'In-Service');
+INSERT INTO GPSLogs (vehicle_id, station_id, arrival_time, departure_time) VALUES
+-- Vehicle 1 (Route A)
+(1, 1, '2025-07-15 08:05:00', '2025-07-15 08:15:00'),
+(1, 2, '2025-07-15 08:20:00', '2025-07-15 08:30:00'),
+(1, 1, '2025-07-22 08:35:00', '2025-07-22 08:45:00'),
+(1, 2, '2025-07-22 08:50:00', '2025-07-22 09:00:00'),
+
+-- Vehicle 2 (Route B)
+(2, 3, '2025-07-16 10:20:00', '2025-07-16 10:25:00'),
+(2, 4, '2025-07-16 10:30:00', '2025-07-16 10:35:00'),
+(2, 14,'2025-07-16 10:38:00', '2025-07-16 10:40:00'),
+(2, 3, '2025-07-24 10:05:00', '2025-07-24 10:10:00'),
+(2, 4, '2025-07-24 10:15:00', '2025-07-24 10:20:00'),
+(2, 14,'2025-07-24 10:22:00', '2025-07-24 10:25:00'),
+
+-- Vehicle 3 (Route A train)
+(3, 1, '2025-07-17 09:15:00', '2025-07-17 09:25:00'),
+(3, 2, '2025-07-17 09:30:00', '2025-07-17 09:40:00'),
+(3, 1, '2025-07-27 09:20:00', '2025-07-27 09:30:00'),
+(3, 2, '2025-07-27 09:35:00', '2025-07-27 09:45:00'),
+
+-- Vehicle 4 (Route B bus)
+(4, 3, '2025-07-19 13:05:00', '2025-07-19 13:10:00'),
+(4, 4, '2025-07-19 13:15:00', '2025-07-19 13:20:00'),
+(4, 14,'2025-07-19 13:22:00', '2025-07-19 13:25:00'),
+(4, 3, '2025-07-29 11:35:00', '2025-07-29 11:40:00'),
+(4, 4, '2025-07-29 11:45:00', '2025-07-29 11:50:00'),
+(4, 14,'2025-07-29 11:55:00', '2025-07-29 12:00:00'),
+
+-- Vehicle 5 (Route C)
+(5, 4, '2025-07-20 09:05:00', '2025-07-20 09:10:00'),
+(5, 5, '2025-07-20 09:15:00', '2025-07-20 09:20:00'),
+(5, 6, '2025-07-20 09:22:00', '2025-07-20 09:25:00'),
+(5, 4, '2025-08-03 14:25:00', '2025-08-03 14:30:00'),
+(5, 5, '2025-08-03 14:35:00', '2025-08-03 14:40:00'),
+(5, 6, '2025-08-03 14:45:00', '2025-08-03 14:50:00');
 
 -- Fuel/Energy Logs
 INSERT INTO FuelLogs (vehicle_id, fuel_used, log_date) VALUES
@@ -284,12 +311,13 @@ INSERT INTO BreakLogs (vehicle_id, operator_id, start_time, end_time, status) VA
 -- Operator 11 (Laura)
 (10, 11, '2025-07-21 14:20:00', '2025-07-21 14:50:00', 'Ended'),
 
--- Operator 12 (Operator - 5 logs)
+-- Operator 12 (at least 5 logs)
 (1, 12, '2025-07-22 08:30:00', '2025-07-22 09:00:00', 'Ended'),
 (2, 12, '2025-07-24 10:00:00', '2025-07-24 10:25:00', 'Ended'),
 (3, 12, '2025-07-27 09:15:00', '2025-07-27 09:45:00', 'Ended'),
 (4, 12, '2025-07-29 11:30:00', '2025-07-29 12:00:00', 'Ended'),
 (5, 12, '2025-08-03 14:20:00', '2025-08-03 14:50:00', 'Ended');
+
 
 
 

@@ -31,8 +31,13 @@ public class VehicleService {
         }
         vehicleDAO.deleteVehicle(vehicleId);
     }
+    
+    public List<String[]> getVehicleIdAndNumber() throws Exception {
+        return vehicleDAO.getVehicleIdAndNumber();
+    }
 
     public List<Vehicle> getAllVehicles() throws Exception {
         return vehicleDAO.getAllVehicles();
     }
+    
 }
