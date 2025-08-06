@@ -9,7 +9,6 @@
     }
 
     String userType = user.getUserType();
-    String viewMode = request.getParameter("view"); // For operators: view=performance
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,22 +19,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f4f4; }
-        .container { width: 90%; margin: 30px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #003366; margin-bottom: 20px; }
+        h2 { text-align: center; color: #003366; margin: 20px 0; }
         .filters { text-align: center; margin-bottom: 20px; }
         .filters input, .filters button { padding: 6px; margin: 5px; }
         .chart-section { margin: 30px 0; }
         .chart-section h3 { text-align: center; margin-bottom: 10px; }
         canvas { display: block; margin: 0 auto; max-width: 600px; }
-        .performance-card { max-width: 400px; margin: 30px auto; padding: 20px; background: #f9f9f9; border-radius: 6px; text-align: center; border: 1px solid #ddd; }
-        .performance-card h3 { margin: 10px 0; color: #333; }
+        .performance-card { max-width: 400px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 8px; text-align: center; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .performance-card h3 { margin: 15px 0; color: #333; }
         .back-link { display: block; text-align: center; margin-top: 20px; }
         .back-link a { color: #007bff; text-decoration: none; }
         .back-link a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="container_management">
     <div style="text-align:right; margin-bottom:10px;">
         <a href="dashboard.jsp" class="back-btn">Back to Dashboard</a>
     </div>
@@ -52,79 +50,117 @@
             <button onclick="loadReports()">Apply Filters</button>
         </div>
 
-        <!-- Maintenance Dashboard -->
+        <!-- Maintenance Summary -->
         <div class="chart-section">
             <h3>Maintenance Summary</h3>
-            <canvas id="maintenanceChart" width="400" height="200"></canvas>
+            <canvas id="maintenanceSummaryChart"></canvas>
         </div>
 
+        <!-- Maintenance Cost Trend -->
         <div class="chart-section">
             <h3>Maintenance Cost Trend</h3>
-            <canvas id="maintenanceCostChart" width="400" height="200"></canvas>
+            <canvas id="maintenanceTrendChart"></canvas>
         </div>
 
         <!-- Cost Analysis -->
         <div class="chart-section">
             <h3>Cost Analysis (Fuel & Maintenance)</h3>
-            <canvas id="costChart" width="400" height="200"></canvas>
+            <canvas id="costAnalysisChart"></canvas>
         </div>
 
         <script>
+            const ctxSummary = document.getElementById('maintenanceSummaryChart');
+            const ctxTrend = document.getElementById('maintenanceTrendChart');
+            const ctxCost = document.getElementById('costAnalysisChart');
+
             function loadReports() {
                 let startDate = document.getElementById("startDate").value;
                 let endDate = document.getElementById("endDate").value;
 
-                fetch(`ReportServlet?action=all&startDate=${startDate}&endDate=${endDate}`)
+                // Maintenance Summary & Trend
+                fetch('<%=request.getContextPath()%>/ReportServlet?action=maintenance&startDate=' + startDate + '&endDate=' + endDate)
                     .then(response => response.json())
                     .then(data => {
-                        updateChart(maintenanceChart, data.maintenance.labels, data.maintenance.values);
-                        updateChart(maintenanceCostChart, data.costTrend.labels, data.costTrend.values);
-                        updateChart(costChart, data.cost.labels, data.cost.values);
+                        if (data.labels && data.values) {
+                            new Chart(ctxSummary, {
+                                type: 'pie',
+                                data: {
+                                    labels: data.labels,
+                                    datasets: [{
+                                        data: data.values,
+                                        backgroundColor: ['#28a745', '#dc3545']
+                                    }]
+                                }
+                            });
+                        }
+                        if (data.trend) {
+                            new Chart(ctxTrend, {
+                                type: 'line',
+                                data: {
+                                    labels: data.trend.labels,
+                                    datasets: [{
+                                        label: 'Maintenance Cost ($)',
+                                        data: data.trend.values,
+                                        borderColor: '#007bff',
+                                        fill: false
+                                    }]
+                                }
+                            });
+                        }
+                    });
+
+                // Cost Analysis
+                fetch('<%=request.getContextPath()%>/ReportServlet?action=cost&startDate=' + startDate + '&endDate=' + endDate)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.labels && data.values) {
+                            new Chart(ctxCost, {
+                                type: 'bar',
+                                data: {
+                                    labels: data.labels,
+                                    datasets: [{
+                                        label: 'Cost ($)',
+                                        data: data.values,
+                                        backgroundColor: ['#17a2b8', '#ffc107']
+                                    }]
+                                }
+                            });
+                        }
                     });
             }
 
-            function updateChart(chart, labels, values) {
-                chart.data.labels = labels;
-                chart.data.datasets[0].data = values;
-                chart.update();
-            }
-
-            // Initialize Charts
-            let maintenanceChart = new Chart(document.getElementById('maintenanceChart'), {
-                type: 'bar',
-                data: { labels: [], datasets: [{ label: 'Tasks', data: [], backgroundColor: '#007bff' }] }
-            });
-
-            let maintenanceCostChart = new Chart(document.getElementById('maintenanceCostChart'), {
-                type: 'line',
-                data: { labels: [], datasets: [{ label: 'Cost ($)', data: [], borderColor: '#28a745', fill: false }] }
-            });
-
-            let costChart = new Chart(document.getElementById('costChart'), {
-                type: 'pie',
-                data: { labels: [], datasets: [{ label: 'Cost', data: [], backgroundColor: ['#ff6384','#36a2eb','#cc65fe'] }] }
-            });
+            // Load default data on page load
+            loadReports();
         </script>
 
-    <% } else if ("performance".equalsIgnoreCase(viewMode)) { %>
+    <% } else if ("Operator".equalsIgnoreCase(userType)) { %>
         <!-- ============================= -->
         <!-- OPERATOR VIEW -->
         <!-- ============================= -->
         <div class="performance-card">
-            <h3>Loading your performance...</h3>
+            <h3>Loading Performance...</h3>
         </div>
 
-
         <script>
-            fetch('ReportServlet?action=operatorPerformance&operatorId=<%= user.getUserId() %>')
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('<%=request.getContextPath()%>/ReportServlet?action=operatorPerformance&operatorId=<%=user.getUserId()%>')
                 .then(response => response.json())
                 .then(data => {
+                    console.log("Operator Performance Data:", data); // Debug
                     document.querySelector('.performance-card').innerHTML = `
                         <h2>My Performance</h2>
-                        <h3>On-Time Arrival Rate: ${data.onTimeRate}%</h3>
-                        <h3>Efficiency Score: ${data.efficiencyScore}%</h3>
+                        <h3>On-Time Arrival Rate: ` + Number(data.onTimeRate).toFixed(2) + `%</h3>
+                        <h3>Efficiency Score: ` + Number(data.efficiencyScore).toFixed(2) + `%</h3>
+                    `;
+                })
+                .catch(err => {
+                    console.error("Error fetching performance:", err);
+                    document.querySelector('.performance-card').innerHTML = `
+                        <h2>My Performance</h2>
+                        <h3>Error loading data</h3>
                     `;
                 });
+        });
         </script>
 
     <% } else { %>
@@ -132,4 +168,11 @@
     <% } %>
 </div>
 </body>
+<footer>
+    <div class="footer">
+        <p>Developed by: Annabel Cheng &copy; 2025</p>
+        <p>25S CST8288 Section 013 Final Project</p>
+    </div>
+    <br><br>
+</footer>
 </html>
