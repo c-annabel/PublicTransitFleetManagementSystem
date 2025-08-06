@@ -5,26 +5,23 @@ import dataaccess.ReportDAO;
 
 public class CostReport implements Report {
 
-    private final ReportDAO dao;
-
-    public CostReport() {
-        this.dao = new ReportDAO();
-    }
-
     @Override
     public JsonObject generateReport(String startDate, String endDate, int operatorId) {
-        JsonObject reportData = new JsonObject();
+        JsonObject json = new JsonObject();
         try {
-            // Labels for cost breakdown
+            ReportDAO dao = new ReportDAO();
+
+            // Cost Analysis (Fuel + Maintenance)
             String[] labels = dao.getCostAnalysisLabels();
             double[] values = dao.getCostAnalysisValues(startDate, endDate);
 
-            reportData.add("labels", ReportUtils.createJsonArray(labels));
-            reportData.add("values", ReportUtils.createJsonArray(values));
+            json.add("labels", ReportUtils.toJsonArray(labels));
+            json.add("values", ReportUtils.toJsonArray(values));
 
         } catch (Exception e) {
             e.printStackTrace();
+            json.addProperty("error", "Failed to generate cost report.");
         }
-        return reportData;
+        return json;
     }
 }

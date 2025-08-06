@@ -5,30 +5,31 @@ import dataaccess.ReportDAO;
 
 public class MaintenanceReport implements Report {
 
-    private final ReportDAO dao;
-
-    public MaintenanceReport() {
-        this.dao = new ReportDAO();
-    }
-
     @Override
     public JsonObject generateReport(String startDate, String endDate, int operatorId) {
-        JsonObject reportData = new JsonObject();
+        JsonObject json = new JsonObject();
         try {
-            // Summary: Completed vs Pending
-            double[] summary = dao.getMaintenanceSummary(startDate, endDate);
-            reportData.add("labels", ReportUtils.createJsonArray(new String[]{"Completed", "Pending"}));
-            reportData.add("values", ReportUtils.createJsonArray(summary));
+            ReportDAO dao = new ReportDAO();
 
-            // Optional: Maintenance trend (date vs cost)
+            // Maintenance Summary
+            double[] summary = dao.getMaintenanceSummary(startDate, endDate);
+            json.add("labels", ReportUtils.toJsonArray(new String[]{"Completed", "Pending"}));
+            json.add("values", ReportUtils.toJsonArray(summary));
+
+            // Maintenance Trend
+            String[] trendLabels = dao.getMaintenanceCostLabels(startDate, endDate);
+            double[] trendValues = dao.getMaintenanceCostValues(startDate, endDate);
+
             JsonObject trend = new JsonObject();
-            trend.add("labels", ReportUtils.createJsonArray(dao.getMaintenanceCostLabels(startDate, endDate)));
-            trend.add("values", ReportUtils.createJsonArray(dao.getMaintenanceCostValues(startDate, endDate)));
-            reportData.add("trend", trend);
+            trend.add("labels", ReportUtils.toJsonArray(trendLabels));
+            trend.add("values", ReportUtils.toJsonArray(trendValues));
+
+            json.add("trend", trend);
 
         } catch (Exception e) {
             e.printStackTrace();
+            json.addProperty("error", "Failed to generate maintenance report.");
         }
-        return reportData;
+        return json;
     }
 }

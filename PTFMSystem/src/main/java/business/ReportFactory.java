@@ -20,7 +20,7 @@ public class ReportFactory {
             case "operatorPerformance":
                 return new OperatorPerformanceReport();
             default:
-                throw new IllegalArgumentException("Invalid report type: " + reportType);
+                throw new IllegalArgumentException("Invalid report type: " + reportType);              
         }
     }
 }

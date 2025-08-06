@@ -15,15 +15,19 @@ public class ReportDAO {
         return dataSource.getConnection();
     }
 
+    
     // ================= Maintenance Summary =================
     public double[] getMaintenanceSummary(String startDate, String endDate) throws SQLException {
+        System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
+
+        
         if (startDate == null || startDate.isEmpty()) startDate = "1970-01-01";
         if (endDate == null || endDate.isEmpty()) endDate = "2099-12-31";
 
         String sql = "SELECT " +
-                     "SUM(CASE WHEN completed = TRUE THEN 1 ELSE 0 END) AS completed, " +
-                     "SUM(CASE WHEN completed = FALSE THEN 1 ELSE 0 END) AS pending " +
-                     "FROM MaintenanceTasks WHERE scheduled_datetime BETWEEN ? AND ?";
+                "SUM(CASE WHEN completed = TRUE THEN 1 ELSE 0 END) AS completed, " +
+                "SUM(CASE WHEN completed = FALSE THEN 1 ELSE 0 END) AS pending " +
+                "FROM MaintenanceTasks WHERE scheduled_datetime BETWEEN ? AND ?";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -39,12 +43,16 @@ public class ReportDAO {
 
     // ================= Maintenance Cost Trend =================
     public String[] getMaintenanceCostLabels(String startDate, String endDate) throws SQLException {
+        System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
+
         if (startDate == null || startDate.isEmpty()) startDate = "1970-01-01";
         if (endDate == null || endDate.isEmpty()) endDate = "2099-12-31";
 
         List<String> labels = new ArrayList<>();
-        String sql = "SELECT DATE(scheduled_datetime) AS date FROM MaintenanceTasks " +
-                     "WHERE scheduled_datetime BETWEEN ? AND ? GROUP BY DATE(scheduled_datetime) ORDER BY DATE(scheduled_datetime)";
+        String sql = "SELECT DATE(scheduled_datetime) AS date " +
+                "FROM MaintenanceTasks " +
+                "WHERE scheduled_datetime BETWEEN ? AND ? " +
+                "GROUP BY DATE(scheduled_datetime) ORDER BY DATE(scheduled_datetime)";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -59,12 +67,16 @@ public class ReportDAO {
     }
 
     public double[] getMaintenanceCostValues(String startDate, String endDate) throws SQLException {
+        System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
+
         if (startDate == null || startDate.isEmpty()) startDate = "1970-01-01";
         if (endDate == null || endDate.isEmpty()) endDate = "2099-12-31";
 
         List<Double> values = new ArrayList<>();
-        String sql = "SELECT SUM(cost) AS total FROM MaintenanceTasks " +
-                     "WHERE scheduled_datetime BETWEEN ? AND ? GROUP BY DATE(scheduled_datetime) ORDER BY DATE(scheduled_datetime)";
+        String sql = "SELECT SUM(cost) AS total " +
+                "FROM MaintenanceTasks " +
+                "WHERE scheduled_datetime BETWEEN ? AND ? " +
+                "GROUP BY DATE(scheduled_datetime) ORDER BY DATE(scheduled_datetime)";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -84,18 +96,22 @@ public class ReportDAO {
     }
 
     public double[] getCostAnalysisValues(String startDate, String endDate) throws SQLException {
-        if (startDate == null || startDate.isEmpty()) startDate = "1970-01-01";
+        System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
+
         if (endDate == null || endDate.isEmpty()) endDate = "2099-12-31";
 
-        double fuelCost = 0.0, maintenanceCost = 0.0;
+        double fuelCost = 0.0;
+        double maintenanceCost = 0.0;
 
         // Fuel cost calculation
-        String sqlFuel = "SELECT SUM(c.fuel_used * p.price_per_unit) AS totalFuel FROM ConsumptionLogs c " +
-                         "JOIN Vehicles v ON c.vehicle_id = v.vehicle_id " +
-                         "JOIN PriceConfig p ON v.fuel_type = p.fuel_type " +
-                         "WHERE c.log_datetime BETWEEN ? AND ? " +
-                         "AND p.effective_date = (" +
-                         " SELECT MAX(effective_date) FROM PriceConfig WHERE fuel_type = v.fuel_type AND effective_date <= c.log_datetime)";
+        String sqlFuel = "SELECT SUM(c.fuel_used * p.price_per_unit) AS totalFuel " +
+                "FROM ConsumptionLogs c " +
+                "JOIN Vehicles v ON c.vehicle_id = v.vehicle_id " +
+                "JOIN PriceConfig p ON v.fuel_type = p.fuel_type " +
+                "WHERE c.log_datetime BETWEEN ? AND ? " +
+                "AND p.effective_date = (" +
+                " SELECT MAX(effective_date) FROM PriceConfig " +
+                " WHERE fuel_type = v.fuel_type AND effective_date <= c.log_datetime)";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sqlFuel)) {
@@ -108,7 +124,9 @@ public class ReportDAO {
         }
 
         // Maintenance cost calculation
-        String sqlMaint = "SELECT SUM(cost) AS totalMaint FROM MaintenanceTasks WHERE scheduled_datetime BETWEEN ? AND ?";
+        String sqlMaint = "SELECT SUM(cost) AS totalMaint " +
+                "FROM MaintenanceTasks " +
+                "WHERE scheduled_datetime BETWEEN ? AND ?";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sqlMaint)) {
@@ -126,10 +144,10 @@ public class ReportDAO {
     // ================= Operator Performance =================
     public double getOnTimeRate(int operatorId) throws SQLException {
         String sql = "SELECT (COUNT(CASE WHEN g.arrival_time <= t.planned_arrival_time THEN 1 END) * 100.0 / COUNT(*)) AS rate " +
-                     "FROM GPSLogs g " +
-                     "JOIN TripSchedules t ON g.station_id = t.station_id AND DATE(g.arrival_time) = DATE(t.planned_arrival_time) " +
-                     "JOIN OperatorAssignments oa ON g.vehicle_id = oa.vehicle_id " +
-                     "WHERE oa.operator_id = ?";
+                "FROM GPSLogs g " +
+                "JOIN TripSchedules t ON g.station_id = t.station_id AND DATE(g.arrival_time) = DATE(t.planned_arrival_time) " +
+                "JOIN OperatorAssignments oa ON g.vehicle_id = oa.vehicle_id " +
+                "WHERE oa.operator_id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -158,7 +176,7 @@ public class ReportDAO {
                 " ) sub " +
                 ") avg_table";
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, operatorId);
             ResultSet rs = ps.executeQuery();

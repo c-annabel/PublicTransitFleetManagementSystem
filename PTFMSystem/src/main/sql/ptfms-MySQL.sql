@@ -486,16 +486,16 @@ INSERT INTO Alerts (vehicle_id, alert_type, alert_message, consumption_value, th
 
 -- MaintenanceTasks (linked to alerts)
 INSERT INTO MaintenanceTasks (vehicle_id, alert_id, description, scheduled_datetime, cost, completed) VALUES
-(1,1,'Inspect fuel system','2025-08-25 09:00:00',750.00,FALSE),
-(2,2,'Check LRT electrical systems','2025-08-26 10:00:00',1200.00,FALSE),
-(3,3,'Engine overhaul','2025-08-27 11:00:00',1800.00,FALSE),
-(4,4,'Replace brake pads','2025-08-28 09:00:00',950.00,FALSE),
-(5,5,'Engine diagnostics','2025-08-29 10:00:00',1100.00,FALSE),
-(6,6,'Energy optimization check','2025-08-30 13:00:00',1300.00,FALSE),
-(7,7,'Inspect pantograph','2025-08-31 14:00:00',1600.00,FALSE),
-(8,8,'Engine tune-up','2025-09-01 15:00:00',1750.00,FALSE),
-(9,9,'Fuel system calibration','2025-09-02 16:00:00',1400.00,FALSE),
-(10,10,'Brake system overhaul','2025-09-03 17:00:00',900.00,FALSE);
+(1,1,'Inspect fuel system','2025-07-15 09:00:00',750.00,TRUE),
+(2,2,'Check LRT electrical systems','2025-07-24 10:00:00',1200.00,TRUE),
+(3,3,'Engine overhaul','2025-07-27 11:00:00',1800.00,TRUE),
+(4,4,'Replace brake pads','2025-07-28 09:00:00',950.00,FALSE),
+(5,5,'Engine diagnostics','2025-08-02 10:00:00',1100.00,TRUE),
+(6,6,'Energy optimization check','2025-08-04 13:00:00',1300.00,TRUE),
+(7,7,'Inspect pantograph','2025-08-18 14:00:00',1600.00,FALSE),
+(8,8,'Engine tune-up','2025-08-19 15:00:00',1750.00,FALSE),
+(9,9,'Fuel system calibration','2025-08-20 16:00:00',1400.00,FALSE),
+(10,10,'Brake system overhaul','2025-08-28 17:00:00',900.00,FALSE);
 
 INSERT INTO TripSchedules (route_id, station_id, planned_arrival_time) VALUES
 (1, 1, '2025-07-15 08:00:00'),
