@@ -2,6 +2,9 @@ package dataaccess;
 
 import transferobjects.MaintenanceTask;
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MaintenanceDAO {
 
@@ -75,6 +78,43 @@ public class MaintenanceDAO {
 
         return false;
     }
+    
+        public boolean isDateAlreadyBooked(int vehicleId, LocalDate selectedDate) {
+        String sql = "SELECT COUNT(*) FROM MaintenanceTasks WHERE vehicle_id = ? AND DATE(scheduled_datetime) = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, vehicleId);
+            ps.setDate(2, java.sql.Date.valueOf(selectedDate));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+        public List<LocalDate> getAllBookedDates() {
+        List<LocalDate> dates = new ArrayList<>();
+        String sql = "SELECT DISTINCT DATE(scheduled_datetime) as booked_date FROM MaintenanceTasks";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                dates.add(rs.getDate("booked_date").toLocalDate());
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dates;
+    }
+
 
     // ✅ Mark a maintenance task as completed
     public boolean markTaskCompleted(int taskId) {

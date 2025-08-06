@@ -70,6 +70,12 @@ public class BookMaintenanceServlet extends HttpServlet {
                 return;
             }
 
+            // ✅ Check if already booked
+            if (maintenanceDAO.isDateAlreadyBooked(vehicleId, selectedDate)) {
+                sendJson(out, "error", "This vehicle is already booked on that date.");
+                return;
+            }
+
             // ✅ Default time is 09:00
             String dateTimeStr = scheduleDate + " 09:00:00";
             Timestamp scheduledTimestamp = Timestamp.valueOf(dateTimeStr);
@@ -99,8 +105,7 @@ public class BookMaintenanceServlet extends HttpServlet {
                 alertDAO.resolveAlert(alertId);
 
                 // ✅ Respond with success
-                out.print("{\"status\":\"success\",\"scheduledDatetime\":\"" +
-                        scheduledTimestamp + "\",\"taskId\":" + taskId + "}");
+                sendJsonSuccess(out, "success", scheduledTimestamp.toString(), taskId);
             } else {
                 sendJson(out, "error", "Failed to save maintenance task");
             }
@@ -117,6 +122,10 @@ public class BookMaintenanceServlet extends HttpServlet {
 
     private void sendJson(PrintWriter out, String status, String message) {
         out.print("{\"status\":\"" + status + "\",\"message\":\"" + message + "\"}");
+    }
+
+    private void sendJsonSuccess(PrintWriter out, String status, String datetime, int taskId) {
+        out.print("{\"status\":\"" + status + "\",\"scheduledDatetime\":\"" + datetime + "\",\"taskId\":" + taskId + "}");
     }
 
     private double getTaskCost(String taskType) {

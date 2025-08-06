@@ -123,6 +123,32 @@ function closeBookingModal() {
     document.getElementById('bookingModal').style.display = 'none';
 }
 
+
+function disableBookedDates() {
+    fetch('check-booked-dates')
+        .then(res => res.json())
+        .then(bookedDates => {
+            const dateInput = document.getElementById('scheduleDate');
+
+            dateInput.addEventListener('input', function () {
+                const selected = this.value;
+                if (bookedDates.includes(selected)) {
+                    alert("This date is already booked. Please choose another.");
+                    this.value = '';
+                }
+            });
+        })
+        .catch(err => console.error("Error loading booked dates:", err));
+}
+
+// Call this when the modal opens:
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.dataset.action === 'book') {
+        disableBookedDates();
+    }
+});
+
+
 // AJAX Booking
 document.getElementById('bookingForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -146,12 +172,16 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
     .then(res => res.json())
     .then(data => {
         if (data.status === 'success') {
-            alert("✅ Maintenance booked for " + data.scheduledDatetime);
+            alert("Maintenance booked successfully for " + data.scheduledDatetime);
             closeBookingModal();
-            loadAlerts();
-        } else {
-            alert("❌ Failed: " + data.message);
+
+            const button = document.querySelector("button[data-alert-id='" + formData.get('alertId') + "']");
+            if (button) {
+                button.parentElement.innerHTML = 
+                  "<span><strong>Maintenance booked:</strong> " + data.scheduledDatetime + "</span>";
+            }
         }
+
     })
     .catch(err => {
         console.error("Booking error:", err);
@@ -169,6 +199,7 @@ document.addEventListener('click', function(e) {
 });
 
 window.onload = loadAlerts;
+
 </script>
 
 </body>
