@@ -2,6 +2,7 @@ package presentation;
 
 import dataaccess.DiagnosticsDAO;
 import dataaccess.AlertDAO;
+import dataaccess.MaintenanceDAO;
 import transferobjects.DiagnosticsLog;
 import transferobjects.Alert;
 
@@ -18,6 +19,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
 
     private DiagnosticsDAO diagnosticsDAO;
     private AlertDAO alertDAO;
+    private MaintenanceDAO maintenanceDAO;
 
     // Threshold constants
     private static final double ENGINE_HEALTH_THRESHOLD = 80.0;
@@ -28,6 +30,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
     public void init() throws ServletException {
         diagnosticsDAO = new DiagnosticsDAO();
         alertDAO = new AlertDAO();
+        maintenanceDAO = new MaintenanceDAO();
     }
 
     @Override
@@ -37,7 +40,6 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-        // Page header
         out.println("<table style='width:100%; border-collapse: collapse;' border='1'>");
         out.println("<thead><tr style='background:#f2f2f2;'>"
                 + "<th>Vehicle ID</th>"
@@ -53,7 +55,6 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
         StringBuilder alertPopup = new StringBuilder();
 
         try {
-            // Fetch latest diagnostics with vehicle type
             List<DiagnosticsLog> logs = diagnosticsDAO.getLatestDiagnosticsWithType();
 
             for (DiagnosticsLog log : logs) {
@@ -65,7 +66,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 String status = "OK";
                 String alertMsg = null;
 
-                // Predictive Maintenance Logic
+                // Predictive logic
                 if ("Diesel Bus".equalsIgnoreCase(vehicleType)) {
                     if (engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD) {
                         status = "Needs Maintenance";
@@ -85,23 +86,25 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                     }
                 }
 
-                // Handle Alert Logic
                 int alertId = -1;
                 if (alertMsg != null) {
                     alertId = alertDAO.getExistingAlertId(log.getVehicleId());
                     if (alertId == -1) {
-                        // Insert new alert
                         Alert alert = new Alert();
                         alert.setVehicleId(log.getVehicleId());
                         alert.setAlertType("Maintenance");
                         alert.setAlertMessage(alertMsg);
                         alert.setSeverity("High");
                         alertId = alertDAO.insertAlert(alert);
+                    }
+
+                    // Collect for popup if no scheduled maintenance
+                    if (!maintenanceDAO.hasScheduledTask(log.getVehicleId())) {
                         alertPopup.append(alertMsg).append("|");
                     }
                 }
 
-                // Render Table Row
+                // Render row
                 out.println("<tr>");
                 out.println("<td>" + log.getVehicleId() + "</td>");
                 out.println("<td>" + vehicleType + "</td>");
@@ -111,17 +114,14 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 out.println("<td>" + (log.getCircuitBreakerCondition() != null ? log.getCircuitBreakerCondition() : "-") + "</td>");
                 out.println("<td>" + status + "</td>");
 
-                // Book Maintenance button if needed
                 if ("Needs Maintenance".equals(status)) {
-                    out.println("<td>");
-                    out.println("<form action='bookMaintenance.jsp' method='get'>");
-                    out.println("<input type='hidden' name='vehicleId' value='" + log.getVehicleId() + "'/>");
-                    if (alertId != -1) {
-                        out.println("<input type='hidden' name='alertId' value='" + alertId + "'/>");
+                    if (!maintenanceDAO.hasScheduledTask(log.getVehicleId())) {
+                        out.println("<td><button type='button' onclick=\"openBookingModal(" +
+                                alertId + "," + log.getVehicleId() + ",'" +
+                                vehicleType + "')\">Book</button></td>");
+                    } else {
+                        out.println("<td>Scheduled</td>");
                     }
-                    out.println("<button type='submit'>Book</button>");
-                    out.println("</form>");
-                    out.println("</td>");
                 } else {
                     out.println("<td>-</td>");
                 }
@@ -130,7 +130,6 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
 
             out.println("</tbody></table>");
 
-            // Hidden Alerts for Popup
             if (alertPopup.length() > 0) {
                 out.println("<div id='hiddenAlerts' style='display:none;'>" + alertPopup.toString() + "</div>");
             }

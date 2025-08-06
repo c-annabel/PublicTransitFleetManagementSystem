@@ -1,0 +1,329 @@
+Folder PATH listing for volume Windows
+Volume serial number is 2E5A-CDD4
+C:.
+|   nb-configuration.xml
+|   pom.xml
+|   ptfms_structure.txt
+|   
++---nbproject
+|       customs.json
+|       project.properties
+|       
++---src
+|   +---main
+|   |   +---java
+|   |   |   +---business
+|   |   |   |   |   BreakLogService.java
+|   |   |   |   |   ConsumptionService.java
+|   |   |   |   |   GPSLogService.java
+|   |   |   |   |   ReportFactory.java
+|   |   |   |   |   RouteStationService.java
+|   |   |   |   |   UserService.java
+|   |   |   |   |   VehicleService.java
+|   |   |   |   |   
+|   |   |   |   +---observer
+|   |   |   |   |       ConsumptionMonitor.java
+|   |   |   |   |       ManagerObserver.java
+|   |   |   |   |       Observer.java
+|   |   |   |   |       Subject.java
+|   |   |   |   |       
+|   |   |   |   +---reports
+|   |   |   |   |       CostReport.java
+|   |   |   |   |       MaintenanceReport.java
+|   |   |   |   |       OperatorPerformanceReport.java
+|   |   |   |   |       Report.java
+|   |   |   |   |       ReportUtils.java
+|   |   |   |   |       
+|   |   |   |   \---strategy
+|   |   |   |           BusConsumptionStrategy.java
+|   |   |   |           ConsumptionContext.java
+|   |   |   |           ConsumptionStrategy.java
+|   |   |   |           DieselElectricTrainConsumptionStrategy.java
+|   |   |   |           ElectricRailConsumptionStrategy.java
+|   |   |   |           
+|   |   |   +---command
+|   |   |   |       BreakLogInvoker.java
+|   |   |   |       Command.java
+|   |   |   |       EndBreakCommand.java
+|   |   |   |       PauseBreakCommand.java
+|   |   |   |       StartBreakCommand.java
+|   |   |   |       
+|   |   |   +---dataaccess
+|   |   |   |       AlertDAO.java
+|   |   |   |       BreakLogDAO.java
+|   |   |   |       ConsumptionDAO.java
+|   |   |   |       DataSource.java
+|   |   |   |       DiagnosticsDAO.java
+|   |   |   |       GPSLogDAO.java
+|   |   |   |       ReportDAO.java
+|   |   |   |       StationDAO.java
+|   |   |   |       UserDAO.java
+|   |   |   |       VehicleConfigDAO.java
+|   |   |   |       VehicleDAO.java
+|   |   |   |       
+|   |   |   +---presentation
+|   |   |   |       AddVehicleServlet.java
+|   |   |   |       AuthFilter.java
+|   |   |   |       BreakActionServlet.java
+|   |   |   |       ConsumptionServlet.java
+|   |   |   |       DeleteVehicleServlet.java
+|   |   |   |       GpsActionServlet.java
+|   |   |   |       LoginServlet.java
+|   |   |   |       LogoutServlet.java
+|   |   |   |       PredictiveMaintenanceServlet.java
+|   |   |   |       RegisterServlet.java
+|   |   |   |       ReportServlet.java
+|   |   |   |       UpdateVehicleServlet.java
+|   |   |   |       
+|   |   |   \---transferobjects
+|   |   |           Alert.java
+|   |   |           BreakLog.java
+|   |   |           ConsumptionRecord.java
+|   |   |           DiagnosticsLog.java
+|   |   |           GPSLog.java
+|   |   |           Station.java
+|   |   |           User.java
+|   |   |           Vehicle.java
+|   |   |           
+|   |   +---resources
+|   |   |   |   database.properties
+|   |   |   |   
+|   |   |   \---META-INF
+|   |   |           persistence.xml
+|   |   |           
+|   |   +---sql
+|   |   |       ptfms-MySQL.sql
+|   |   |       
+|   |   \---webapp
+|   |       |   alertsMaintenance.jsp
+|   |       |   breakLog.jsp
+|   |       |   dashboard.jsp
+|   |       |   gpsOperator.jsp
+|   |       |   login.jsp
+|   |       |   monitoring.jsp
+|   |       |   register.jsp
+|   |       |   reports.jsp
+|   |       |   vehicleManagement.jsp
+|   |       |   
+|   |       +---css
+|   |       |       style.css
+|   |       |       
+|   |       +---META-INF
+|   |       |       context.xml
+|   |       |       
+|   |       \---WEB-INF
+|   |               beans.xml
+|   |               web.xml
+|   |               
+|   \---test
+|       \---java
+|           \---Presentation
+\---target
+    |   PTFMSystem-1.0.war
+    |   
+    +---classes
+    |   |   database.properties
+    |   |   
+    |   +---business
+    |   |   |   BreakLogService.class
+    |   |   |   ConsumptionService.class
+    |   |   |   GPSLogService.class
+    |   |   |   ReportFactory.class
+    |   |   |   RouteStationService.class
+    |   |   |   UserService.class
+    |   |   |   VehicleService.class
+    |   |   |   
+    |   |   +---observer
+    |   |   |       ConsumptionMonitor.class
+    |   |   |       ManagerObserver.class
+    |   |   |       Observer.class
+    |   |   |       Subject.class
+    |   |   |       
+    |   |   +---reports
+    |   |   |       CostReport.class
+    |   |   |       MaintenanceReport.class
+    |   |   |       OperatorPerformanceReport.class
+    |   |   |       Report.class
+    |   |   |       ReportUtils.class
+    |   |   |       
+    |   |   \---strategy
+    |   |           BusConsumptionStrategy.class
+    |   |           ConsumptionContext.class
+    |   |           ConsumptionStrategy.class
+    |   |           DieselElectricTrainConsumptionStrategy.class
+    |   |           ElectricRailConsumptionStrategy.class
+    |   |           
+    |   +---command
+    |   |       BreakLogInvoker.class
+    |   |       Command.class
+    |   |       EndBreakCommand.class
+    |   |       PauseBreakCommand.class
+    |   |       StartBreakCommand.class
+    |   |       
+    |   +---dataaccess
+    |   |       AlertDAO.class
+    |   |       BreakLogDAO.class
+    |   |       ConsumptionDAO.class
+    |   |       DataSource.class
+    |   |       DiagnosticsDAO.class
+    |   |       GPSLogDAO.class
+    |   |       ReportDAO.class
+    |   |       StationDAO.class
+    |   |       UserDAO.class
+    |   |       VehicleConfigDAO.class
+    |   |       VehicleDAO.class
+    |   |       
+    |   +---META-INF
+    |   |       persistence.xml
+    |   |       
+    |   +---presentation
+    |   |       AddVehicleServlet.class
+    |   |       AuthFilter.class
+    |   |       BreakActionServlet.class
+    |   |       ConsumptionServlet.class
+    |   |       DeleteVehicleServlet.class
+    |   |       GpsActionServlet.class
+    |   |       LoginServlet.class
+    |   |       LogoutServlet.class
+    |   |       PredictiveMaintenanceServlet.class
+    |   |       RegisterServlet.class
+    |   |       ReportServlet.class
+    |   |       UpdateVehicleServlet.class
+    |   |       
+    |   \---transferobjects
+    |           Alert.class
+    |           BreakLog.class
+    |           ConsumptionRecord.class
+    |           DiagnosticsLog.class
+    |           GPSLog.class
+    |           Station.class
+    |           User.class
+    |           Vehicle$Builder.class
+    |           Vehicle.class
+    |           
+    +---generated-sources
+    |   \---annotations
+    +---generated-test-sources
+    |   \---test-annotations
+    +---maven-archiver
+    |       pom.properties
+    |       
+    +---maven-status
+    |   \---maven-compiler-plugin
+    |       +---compile
+    |       |   \---default-compile
+    |       |           createdFiles.lst
+    |       |           inputFiles.lst
+    |       |           
+    |       \---testCompile
+    |           \---default-testCompile
+    |                   createdFiles.lst
+    |                   inputFiles.lst
+    |                   
+    +---PTFMSystem-1.0
+    |   |   alertsMaintenance.jsp
+    |   |   breakLog.jsp
+    |   |   dashboard.jsp
+    |   |   gpsOperator.jsp
+    |   |   login.jsp
+    |   |   monitoring.jsp
+    |   |   register.jsp
+    |   |   reports.jsp
+    |   |   vehicleManagement.jsp
+    |   |   
+    |   +---css
+    |   |       style.css
+    |   |       
+    |   +---META-INF
+    |   |       context.xml
+    |   |       
+    |   \---WEB-INF
+    |       |   beans.xml
+    |       |   web.xml
+    |       |   
+    |       +---classes
+    |       |   |   database.properties
+    |       |   |   
+    |       |   +---business
+    |       |   |   |   BreakLogService.class
+    |       |   |   |   ConsumptionService.class
+    |       |   |   |   GPSLogService.class
+    |       |   |   |   ReportFactory.class
+    |       |   |   |   RouteStationService.class
+    |       |   |   |   UserService.class
+    |       |   |   |   VehicleService.class
+    |       |   |   |   
+    |       |   |   +---observer
+    |       |   |   |       ConsumptionMonitor.class
+    |       |   |   |       ManagerObserver.class
+    |       |   |   |       Observer.class
+    |       |   |   |       Subject.class
+    |       |   |   |       
+    |       |   |   +---reports
+    |       |   |   |       CostReport.class
+    |       |   |   |       MaintenanceReport.class
+    |       |   |   |       OperatorPerformanceReport.class
+    |       |   |   |       Report.class
+    |       |   |   |       ReportUtils.class
+    |       |   |   |       
+    |       |   |   \---strategy
+    |       |   |           BusConsumptionStrategy.class
+    |       |   |           ConsumptionContext.class
+    |       |   |           ConsumptionStrategy.class
+    |       |   |           DieselElectricTrainConsumptionStrategy.class
+    |       |   |           ElectricRailConsumptionStrategy.class
+    |       |   |           
+    |       |   +---command
+    |       |   |       BreakLogInvoker.class
+    |       |   |       Command.class
+    |       |   |       EndBreakCommand.class
+    |       |   |       PauseBreakCommand.class
+    |       |   |       StartBreakCommand.class
+    |       |   |       
+    |       |   +---dataaccess
+    |       |   |       AlertDAO.class
+    |       |   |       BreakLogDAO.class
+    |       |   |       ConsumptionDAO.class
+    |       |   |       DataSource.class
+    |       |   |       DiagnosticsDAO.class
+    |       |   |       GPSLogDAO.class
+    |       |   |       ReportDAO.class
+    |       |   |       StationDAO.class
+    |       |   |       UserDAO.class
+    |       |   |       VehicleConfigDAO.class
+    |       |   |       VehicleDAO.class
+    |       |   |       
+    |       |   +---META-INF
+    |       |   |       persistence.xml
+    |       |   |       
+    |       |   +---presentation
+    |       |   |       AddVehicleServlet.class
+    |       |   |       AuthFilter.class
+    |       |   |       BreakActionServlet.class
+    |       |   |       ConsumptionServlet.class
+    |       |   |       DeleteVehicleServlet.class
+    |       |   |       GpsActionServlet.class
+    |       |   |       LoginServlet.class
+    |       |   |       LogoutServlet.class
+    |       |   |       PredictiveMaintenanceServlet.class
+    |       |   |       RegisterServlet.class
+    |       |   |       ReportServlet.class
+    |       |   |       UpdateVehicleServlet.class
+    |       |   |       
+    |       |   \---transferobjects
+    |       |           Alert.class
+    |       |           BreakLog.class
+    |       |           ConsumptionRecord.class
+    |       |           DiagnosticsLog.class
+    |       |           GPSLog.class
+    |       |           Station.class
+    |       |           User.class
+    |       |           Vehicle$Builder.class
+    |       |           Vehicle.class
+    |       |           
+    |       \---lib
+    |               gson-2.10.1.jar
+    |               mysql-connector-j-8.0.31.jar
+    |               protobuf-java-3.19.4.jar
+    |               
+    \---test-classes

@@ -84,4 +84,11 @@
 </div>
 
 </body>
+<footer>
+    <div class="footer">
+        <p>Developed by: Annabel Cheng &copy; 2025</p>
+        <p>25S CST8288 Section 013 Final Project</p>
+    </div>
+    <br><br>
+</footer>
 </html>
