@@ -21,7 +21,6 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
     private AlertDAO alertDAO;
     private MaintenanceDAO maintenanceDAO;
 
-    // Threshold constants
     private static final double ENGINE_HEALTH_THRESHOLD = 80.0;
     private static final double PANTOGRAPH_THRESHOLD = 85.0;
     private static final double CATENARY_THRESHOLD = 85.0;
@@ -58,6 +57,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
             List<DiagnosticsLog> logs = diagnosticsDAO.getLatestDiagnosticsWithType();
 
             for (DiagnosticsLog log : logs) {
+                int vehicleId = log.getVehicleId();
                 String vehicleType = log.getVehicleType();
                 BigDecimal engineHealth = log.getEngineHealth();
                 BigDecimal pantograph = log.getPantographCondition();
@@ -66,47 +66,48 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 String status = "OK";
                 String alertMsg = null;
 
-                // Predictive logic
                 if ("Diesel Bus".equalsIgnoreCase(vehicleType)) {
                     if (engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD) {
                         status = "Needs Maintenance";
-                        alertMsg = "Diesel Bus (ID: " + log.getVehicleId() + ") engine health below 80%.";
+                        alertMsg = "Diesel Bus (ID: " + vehicleId + ") engine health below 80%";
                     }
                 } else if ("Diesel-Electric Train".equalsIgnoreCase(vehicleType)) {
-                    if ((engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD) ||
-                            (pantograph != null && pantograph.doubleValue() < PANTOGRAPH_THRESHOLD)) {
+                    if ((engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD)
+                            || (pantograph != null && pantograph.doubleValue() < PANTOGRAPH_THRESHOLD)) {
                         status = "Needs Maintenance";
-                        alertMsg = "Train (ID: " + log.getVehicleId() + ") engine or pantograph below threshold.";
+                        alertMsg = "Train (ID: " + vehicleId + ") engine or pantograph below threshold";
                     }
                 } else if ("Electric Light Rail".equalsIgnoreCase(vehicleType)) {
-                    if ((pantograph != null && pantograph.doubleValue() < PANTOGRAPH_THRESHOLD) ||
-                            (catenary != null && catenary.doubleValue() < CATENARY_THRESHOLD)) {
+                    if ((pantograph != null && pantograph.doubleValue() < PANTOGRAPH_THRESHOLD)
+                            || (catenary != null && catenary.doubleValue() < CATENARY_THRESHOLD)) {
                         status = "Needs Maintenance";
-                        alertMsg = "Light Rail (ID: " + log.getVehicleId() + ") pantograph or catenary below threshold.";
+                        alertMsg = "Light Rail (ID: " + vehicleId + ") pantograph or catenary below threshold";
                     }
                 }
 
                 int alertId = -1;
+                boolean hasExistingTask = false;
+
                 if (alertMsg != null) {
-                    alertId = alertDAO.getExistingAlertId(log.getVehicleId());
+                    alertId = alertDAO.getExistingAlertId(vehicleId);
+
                     if (alertId == -1) {
                         Alert alert = new Alert();
-                        alert.setVehicleId(log.getVehicleId());
+                        alert.setVehicleId(vehicleId);
                         alert.setAlertType("Maintenance");
                         alert.setAlertMessage(alertMsg);
                         alert.setSeverity("High");
                         alertId = alertDAO.insertAlert(alert);
                     }
 
-                    // Collect for popup if no scheduled maintenance
-                    if (!maintenanceDAO.hasScheduledTask(log.getVehicleId())) {
+                    hasExistingTask = maintenanceDAO.hasScheduledTaskForVehicle(vehicleId);
+                    if (!hasExistingTask) {
                         alertPopup.append(alertMsg).append("|");
                     }
                 }
 
-                // Render row
                 out.println("<tr>");
-                out.println("<td>" + log.getVehicleId() + "</td>");
+                out.println("<td>" + vehicleId + "</td>");
                 out.println("<td>" + vehicleType + "</td>");
                 out.println("<td>" + (engineHealth != null ? engineHealth : "-") + "</td>");
                 out.println("<td>" + (catenary != null ? catenary : "-") + "</td>");
@@ -114,17 +115,14 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 out.println("<td>" + (log.getCircuitBreakerCondition() != null ? log.getCircuitBreakerCondition() : "-") + "</td>");
                 out.println("<td>" + status + "</td>");
 
-                if ("Needs Maintenance".equals(status)) {
-                    if (!maintenanceDAO.hasScheduledTask(log.getVehicleId())) {
-                        out.println("<td><button type='button' onclick=\"openBookingModal(" +
-                                alertId + "," + log.getVehicleId() + ",'" +
-                                vehicleType + "')\">Book</button></td>");
-                    } else {
-                        out.println("<td>Scheduled</td>");
-                    }
+                if ("Needs Maintenance".equals(status) && !hasExistingTask) {
+                    out.println("<td>");
+                    out.println("<button type='button' data-action='book' data-vehicle-id='" + vehicleId + "' data-alert-id='" + alertId + "'>Book</button>");
+                    out.println("</td>");
                 } else {
                     out.println("<td>-</td>");
                 }
+
                 out.println("</tr>");
             }
 

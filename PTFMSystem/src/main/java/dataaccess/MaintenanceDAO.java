@@ -11,7 +11,7 @@ public class MaintenanceDAO {
         dataSource = DataSource.getInstance();
     }
 
-    // ✅ Check if a scheduled maintenance task exists for a vehicle
+    // ✅ Check if a scheduled maintenance task exists for this vehicle
     public boolean hasScheduledTask(int vehicleId) {
         String sql = "SELECT COUNT(*) FROM MaintenanceTasks WHERE vehicle_id = ? AND completed = FALSE";
         try (Connection conn = dataSource.getConnection();
@@ -28,7 +28,7 @@ public class MaintenanceDAO {
         return false;
     }
 
-    // ✅ Insert a new maintenance task
+    // ✅ Insert a new maintenance task and return its generated ID
     public int insertMaintenanceTask(MaintenanceTask task) {
         String sql = "INSERT INTO MaintenanceTasks (vehicle_id, alert_id, description, scheduled_datetime, cost, completed) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
@@ -53,8 +53,30 @@ public class MaintenanceDAO {
         }
         return -1;
     }
+    
+        // MaintenanceDAO.java
+    public boolean hasScheduledTaskForVehicle(int vehicleId) {
+        String sql = "SELECT COUNT(*) FROM MaintenanceTasks WHERE vehicle_id = ? AND completed = FALSE";
 
-    // ✅ Mark maintenance task as completed
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, vehicleId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // ✅ Mark a maintenance task as completed
     public boolean markTaskCompleted(int taskId) {
         String sql = "UPDATE MaintenanceTasks SET completed = TRUE WHERE task_id = ?";
         try (Connection conn = dataSource.getConnection();
