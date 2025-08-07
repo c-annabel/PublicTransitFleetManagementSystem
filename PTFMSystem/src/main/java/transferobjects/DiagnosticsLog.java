@@ -3,6 +3,18 @@ package transferobjects;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+/**
+ * DiagnosticsLog.java - Transfer Object representing a vehicle diagnostics log.
+ *
+ * This class is part of the CST8288 Final Project.
+ * It stores component health data such as brake condition, tire condition, and axle condition
+ * along with timestamps and associated vehicle ID.
+ *
+ * Used for system diagnostics, monitoring, and reporting.
+ * 
+ * @author Annabel Cheng
+ */
+
 public class DiagnosticsLog {
     private int vehicleId;
     private String vehicleType;

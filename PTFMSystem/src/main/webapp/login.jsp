@@ -1,3 +1,19 @@
+<%--
+  /**
+   * login.jsp - User Login Page
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It provides a login form for both Manager and Operator users to authenticate into the system.
+   *
+   * Features:
+   * - Displays login errors and session-related messages via query parameters
+   * - Accepts email and password credentials
+   * - Redirects to registration page if user doesn’t have an account
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">

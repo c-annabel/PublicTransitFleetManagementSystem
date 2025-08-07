@@ -5,14 +5,29 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) for handling operations related to Stations.
+ * This class provides methods to retrieve station data from the database.
+ * 
+ * @author Annabel Cheng
+ * @comment Course 25S CST8288 Lab013 Final Project
+ */
 public class StationDAO {
     private final DataSource dataSource;
 
+    /**
+     * Constructs a StationDAO and initializes the DataSource instance.
+     */
     public StationDAO() {
         dataSource = DataSource.getInstance();
     }
 
-    // Fetch all stations (id + name)
+    /**
+     * Retrieves a list of all stations containing only their ID and name.
+     *
+     * @return A list of string arrays, where each array contains the station ID and station name.
+     * @throws SQLException if a database access error occurs.
+     */
     public List<String[]> getStationIdAndName() throws SQLException {
         String sql = "SELECT station_id, station_name FROM Stations";
         List<String[]> list = new ArrayList<>();
@@ -30,7 +45,12 @@ public class StationDAO {
         return list;
     }
 
-    // (Optional) Get full Station list
+    /**
+     * Retrieves a list of all stations with full details (ID, name, location).
+     *
+     * @return A list of Station objects containing complete station information.
+     * @throws SQLException if a database access error occurs.
+     */
     public List<Station> getAllStations() throws SQLException {
         String sql = "SELECT * FROM Stations";
         List<Station> stations = new ArrayList<>();

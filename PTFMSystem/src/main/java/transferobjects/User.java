@@ -1,5 +1,16 @@
 package transferobjects;
 
+/**
+ * User.java - Transfer Object for authenticated user data.
+ *
+ * This class is part of the CST8288 Final Project.
+ * It stores user attributes including ID, name, email, password, and role (Manager/Operator).
+ *
+ * Central to access control, authentication, and session management.
+ * 
+ * @author Annabel Cheng
+ */
+
 public class User {
     private int userId;
     private String name;

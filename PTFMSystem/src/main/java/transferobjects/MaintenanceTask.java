@@ -3,6 +3,18 @@ package transferobjects;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+/**
+ * MaintenanceTask.java - Transfer Object for managing vehicle maintenance tasks.
+ *
+ * This class is part of the CST8288 Final Project.
+ * It includes information such as task ID, vehicle ID, description, scheduled date,
+ * cost, and completion status for maintenance operations.
+ *
+ * Serves as a model in maintenance scheduling and reporting features.
+ * 
+ * @author Annabel Cheng
+ */
+
 public class MaintenanceTask {
     private int taskId;
     private int vehicleId;

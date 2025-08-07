@@ -1,5 +1,25 @@
+<%--
+  /**
+   * gpsOperator.jsp - GPS Tracking and Logging Page
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It allows Operators to log vehicle arrivals and departures at stations,
+   * and displays a GPS log report for all users (Managers can view only).
+   *
+   * Features:
+   * - Session validation to ensure only logged-in users can access
+   * - Conditional form display: Operators can log GPS data; Managers view only
+   * - Dropdowns are dynamically populated from database (vehicles/stations)
+   * - Displays a table of GPS logs with arrival and departure times
+   * - Feedback messages after logging actions
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, transferobjects.User, business.GPSLogService, dataaccess.VehicleDAO, dataaccess.StationDAO" %>
+
 <%
     // Validate user session
     User user = (User) session.getAttribute("user");
@@ -31,6 +51,7 @@
         e.printStackTrace();
     }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,13 +128,15 @@
 </head>
 <body>
 <div class="container_management">
-    <!-- Back Button -->
+
+    <!-- Back to Dashboard -->
     <div style="text-align:right; margin-bottom:10px;">
         <a href="dashboard.jsp" class="back-btn">Back to Dashboard</a>
     </div>
+
     <h2>GPS Tracking</h2>
 
-    <!-- Feedback message -->
+    <!-- Feedback Messages -->
     <%
         String msg = request.getParameter("msg");
         String type = request.getParameter("type");
@@ -128,7 +151,7 @@
         <div class="<%= cssClass %>"><%= msg %></div>
     <% } %>
 
-    <!-- Operator Form (disabled for Manager) -->
+    <!-- Logging Form (Only for Operator) -->
     <%
         if (!isManager) {
     %>
@@ -168,7 +191,7 @@
     </form>
     <% } %>
 
-    <!-- GPS Logs Report -->
+    <!-- GPS Logs Table -->
     <h3>GPS Logs Report</h3>
     <table>
         <thead>

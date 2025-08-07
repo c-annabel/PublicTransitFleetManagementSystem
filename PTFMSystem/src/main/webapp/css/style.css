@@ -1,3 +1,13 @@
+/**
+ * Global stylesheet for CST8288 Final Project.
+ *
+ * This CSS file defines the visual presentation of the application,
+ * including layout containers, form elements, buttons, tables, and alerts.
+ * It is shared across multiple JSP/HTML files for consistent styling.
+ * 
+ * @author Annabel Cheng
+ */
+
 /* Global Styles */
 body {
     font-family: Arial, sans-serif;
@@ -19,7 +29,7 @@ body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-/* Container for forms and content */
+/* Management page layout container */
 .container_management {
     width: 80%;
     height: 90%;
@@ -70,9 +80,10 @@ button:hover {
     background-color: #0056b3;
 }
 
+/* Button row layout */
 .button-row {
     display: flex;
-    gap: 50px; /* space between buttons */
+    gap: 50px;
     margin-top: 10px;
     justify-content: center;
 }
@@ -80,23 +91,24 @@ button:hover {
 .button-row button {
     background-color: #007bff;
     color: #fff;
-    font-size: 14px; /* slightly smaller text */
+    font-size: 14px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    padding: 8px 16px; /* smaller padding */
-    flex: 1; /* make them equal width */
-    max-width: 150px; /* optional: limit max size */
+    padding: 8px 16px;
+    flex: 1;
+    max-width: 150px;
 }
 
 .button-row button:hover {
     background-color: #0056b3;
 }
 
+/* Back button */
 .back-btn {
     display: inline-block;
     padding: 10px 18px;
-    background-color: #ff9800; /* Orange */
+    background-color: #ff9800;
     color: white;
     text-decoration: none;
     border-radius: 4px;
@@ -104,8 +116,9 @@ button:hover {
     font-weight: bold;
     transition: background-color 0.3s ease;
 }
+
 .back-btn:hover {
-    background-color: #e68900; /* Darker orange on hover */
+    background-color: #e68900;
 }
 
 /* Links */
@@ -118,6 +131,7 @@ a:hover {
     text-decoration: underline;
 }
 
+/* Form row layout */
 .form-row {
     display: flex;
     align-items: center;
@@ -125,30 +139,31 @@ a:hover {
 }
 
 .form-row label {
-    width: 200px; /* adjust based on your design */
+    width: 200px;
     font-weight: bold;
 }
 
 .form-row input,
 .form-row select {
-    flex: 1; /* take remaining space */
+    flex: 1;
     padding: 8px;
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
+/* Styled table */
 .styled-table {
     width: 100%;
-    border-collapse: collapse; /* ensures single border, not double */
-    border: 1px solid; /* apply outer border */
+    border-collapse: collapse;
+    border: 1px solid;
 }
 
 .styled-table th,
 .styled-table td {
-    border: 1px solid; /* apply inner cell borders */
-    padding: 8px; /* add spacing inside cells */
-    text-align: left; /* align text */
+    border: 1px solid;
+    padding: 8px;
+    text-align: left;
 }
 
 /* Message Alerts */
@@ -157,12 +172,12 @@ a:hover {
     margin: 10px 0;
     padding: 8px;
     border-radius: 4px;
-    background-color: #f8d7da; /* Light red for error */
+    background-color: #f8d7da;
     color: #721c24;
 }
 
 .message.success {
-    background-color: #d4edda; /* Light green for success */
+    background-color: #d4edda;
     color: #155724;
 }
 
@@ -170,17 +185,20 @@ a:hover {
     color: green;
 }
 
+/* Input row styling */
 .row input {
     flex: 2;
-    min-width: 200px; /* Ensures good size */
-    padding: 10px;    /* Comfortable spacing */
-    font-size: 16px;  /* Readable text */
+    min-width: 200px;
+    padding: 10px;
+    font-size: 16px;
 }
+
 .row button {
     padding: 10px 15px;
     font-size: 16px;
 }
 
+/* Footer */
 .footer { 
     margin-top: 10px;  
     border-top: 1px solid #eee; 

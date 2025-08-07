@@ -1,6 +1,26 @@
+<%--
+  /**
+   * BreakLog.jsp - Operator Break Logging Interface
+   *
+   * This page is part of the CST8288 Final Project.
+   * It allows Operators to start, pause, and end their break sessions, 
+   * and displays a table of their break log history.
+   *
+   * Features:
+   * - Authenticates that only logged-in Operators may access this page.
+   * - Provides interactive controls to manage break records.
+   * - Displays a formatted table of break logs retrieved from the backend.
+   * - Uses messages to confirm success/error operations.
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, transferobjects.BreakLog, business.BreakLogService, transferobjects.User" %>
+
 <%
+    // Ensure user is logged in and is an Operator
     User user = (User) session.getAttribute("user");
     if (user == null || !"Operator".equalsIgnoreCase(user.getUserType())) {
         response.sendRedirect("login.jsp");
@@ -15,6 +35,7 @@
         e.printStackTrace();
     }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,12 +95,10 @@
           padding: 8px;
           border-radius: 4px;
         }
-
         .message.success {
             background-color: #d4edda;
             color: #155724;
         }
-
         .message.error {
             background-color: #f8d7da;
             color: #721c24;
@@ -88,42 +107,43 @@
 </head>
 <body>
 <div class="container_management">
-    <!-- Back Button -->
+
+    <!-- Back to dashboard -->
     <div style="text-align:right; margin-bottom:10px;">
         <a href="dashboard.jsp" class="back-btn">Back to Dashboard</a>
     </div>
+
     <h2>Break Log</h2>
 
-    <!-- Display feedback messages -->
+    <!-- Show feedback message if available -->
     <%
         String msg = request.getParameter("msg");
         String type = request.getParameter("type");
         if (msg != null && !msg.isEmpty()) {
-        
-        String cssClass = "message";
-        if ("success".equals(type)) {
-            cssClass += " success";
-        } else if ("error".equals(type)) {
-            cssClass += " error";
-        }
+            String cssClass = "message";
+            if ("success".equals(type)) {
+                cssClass += " success";
+            } else if ("error".equals(type)) {
+                cssClass += " error";
+            }
     %>
         <div class="<%= cssClass %>">
             <%= msg %>
         </div>
     <% } %>
 
-    <!-- Break Action Form -->
+    <!-- Break Form -->
     <form action="breakAction" method="post">
         <input type="hidden" name="operatorId" value="<%= user.getUserId() %>">
 
-        <!-- Row 1: Vehicle ID and Start Break -->
+        <!-- Start Break -->
         <div class="row">
             <label for="vehicleId">Vehicle ID:</label>
             <input type="number" id="vehicleId" name="vehicleId">
             <button type="submit" name="action" value="start">Start Break</button>
         </div>
 
-        <!-- Row 2: Break ID and Pause/End Break -->
+        <!-- Pause/End Break -->
         <div class="row">
             <label for="breakId">Break ID:</label>
             <input type="number" id="breakId" name="breakId">
@@ -131,8 +151,10 @@
             <button type="submit" name="action" value="end">End Break</button>
         </div>
     </form>
-        <br><br>
-    <!-- Break Logs Table -->
+
+    <br><br>
+
+    <!-- Display Logs -->
     <h3>Your Break Logs</h3>
     <table>
         <thead>
@@ -168,7 +190,6 @@
         %>
         </tbody>
     </table>
-
 </div>
 </body>
 <footer>

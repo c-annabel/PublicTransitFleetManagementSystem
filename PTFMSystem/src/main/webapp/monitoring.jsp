@@ -1,4 +1,24 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%--
+  /**
+   * monitoring.jsp - FR04 Real-Time Fuel & Energy Monitoring
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It fetches and displays live fuel and energy consumption data
+   * for transit vehicles, and shows a popup alert for components 
+   * operating below safe thresholds (e.g. pantograph, catenary, brake, etc.).
+   *
+   * Features:
+   * - Dynamically loads data from the 'consumption' servlet using fetch API
+   * - Displays alert popup for threshold breaches using hidden div markers
+   * - Responsive table for real-time monitoring data
+   * - Accessible to both Manager and Operator roles (if session validation added)
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <!DOCTYPE html>
 <html>
 <head>

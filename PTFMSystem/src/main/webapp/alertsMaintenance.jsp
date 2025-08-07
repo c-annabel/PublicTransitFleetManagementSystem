@@ -1,3 +1,21 @@
+<%--
+  /**
+   * FR05 - Predictive Maintenance Alerts Page
+   * 
+   * This JSP/HTML page is part of the CST8288 Final Project.
+   * It displays real-time maintenance alerts for transit vehicles and allows
+   * users to book maintenance tasks using AJAX and modal forms.
+   * 
+   * Key Features:
+   * - Real-time alert fetching from predictive-maintenance servlet
+   * - Modal form to schedule maintenance tasks
+   * - Alert popup for managers
+   * - Date validation with 2-day minimum and conflict checking
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -129,12 +147,11 @@ function disableBookedDates() {
         .then(res => res.json())
         .then(bookedDates => {
             console.log("Booked dates received:", bookedDates);
-    
+
             window.bookedDates = bookedDates; 
 
             const dateInput = document.getElementById('scheduleDate');
 
-            // Attach listener after setting available dates
             dateInput.onchange = function () {
                 const selected = this.value.trim();
                 console.log("User selected date:", selected);
@@ -151,15 +168,7 @@ function disableBookedDates() {
         .catch(err => console.error("Error loading booked dates:", err));
 }
 
-//// Call this when the modal opens:
-//document.addEventListener('click', function(e) {
-//    if (e.target && e.target.dataset.action === 'book') {
-//        disableBookedDates();
-//    }
-//});
-
-
-// AJAX Booking
+// Handle form submit for maintenance booking
 document.getElementById('bookingForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
@@ -168,14 +177,12 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
         alert("Please select a valid date.");
         return;
     }
-    
-        // ✅ Double-check against booked dates before submitting
+
     if (window.bookedDates && window.bookedDates.includes(date.trim())) {
         alert("This date is already booked. Please choose another.");
         return;
     }
 
-    // Automatically set time to 09:00
     formData.append("timeSlot", "09:00");
 
     console.log("Submitting form data:", Object.fromEntries(formData));
@@ -197,7 +204,6 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
                   "<span><strong>Maintenance booked:</strong> " + data.scheduledDatetime + "</span>";
             }
         }
-
     })
     .catch(err => {
         console.error("Booking error:", err);
@@ -215,7 +221,6 @@ document.addEventListener('click', function(e) {
 });
 
 window.onload = loadAlerts;
-
 </script>
 
 </body>

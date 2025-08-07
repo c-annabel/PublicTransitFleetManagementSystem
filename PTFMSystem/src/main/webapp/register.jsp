@@ -1,4 +1,22 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%--
+  /**
+   * register.jsp - User Registration Page
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It allows new users (Managers or Operators) to register with a full name, 
+   * email, password, and user type.
+   *
+   * Features:
+   * - Form validation for all fields
+   * - Displays feedback messages on success, failure, or duplicate email
+   * - Redirects to login.jsp after successful registration
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,7 +102,7 @@
         <input type="text" name="name" placeholder="Full Name" required>
         <input type="email" name="email" placeholder="Email Address" required>
         <input type="password" name="password" placeholder="Password" required minlength="6">
-        
+
         <select name="userType" required>
             <option value="">Select User Type</option>
             <option value="Manager">Manager</option>

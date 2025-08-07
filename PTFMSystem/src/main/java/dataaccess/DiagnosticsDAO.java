@@ -6,13 +6,35 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) for managing DiagnosticsLog objects.
+ * This class provides methods to retrieve diagnostic information from the database,
+ * often joined with usage data.
+ *
+ * @author Annabel Cheng
+ * @comment CST8288 Lab 013 Final Project
+ */
 public class DiagnosticsDAO {
-        private final DataSource dataSource;
+    /**
+     * The DataSource instance used to get database connections.
+     */
+    private final DataSource dataSource;
 
+    /**
+     * Constructs a new DiagnosticsDAO and initializes the DataSource instance.
+     */
     public DiagnosticsDAO() {
         dataSource = DataSource.getInstance();
     }
     
+    /**
+     * Retrieves a list of the latest diagnostics logs for each vehicle,
+     * including associated usage data.
+     *
+     * @return A list of DiagnosticsLog objects, each representing the latest
+     * diagnostics and usage data for a vehicle.
+     * @throws SQLException If a database access error occurs.
+     */
     public List<DiagnosticsLog> getLatestDiagnosticsWithUsage() throws SQLException {
         List<DiagnosticsLog> diagnosticsList = new ArrayList<>();
 
@@ -64,7 +86,6 @@ public class DiagnosticsDAO {
                 diagnosticsList.add(log);
             }
         }
-
         return diagnosticsList;
     }
 }

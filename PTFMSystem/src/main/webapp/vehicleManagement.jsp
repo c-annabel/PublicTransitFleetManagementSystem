@@ -1,4 +1,22 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--
+  /**
+   * vehicleManagement.jsp - Vehicle Management Interface
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It allows Managers to view, add, update, and delete vehicle records 
+   * for the public transit fleet.
+   *
+   * Features:
+   * - Input form for adding and editing vehicles
+   * - Radio-button selection for single vehicle editing
+   * - Client-side UI with Bootstrap-styled layout and internal CSS
+   * - Integrated feedback via alert/message display
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <%@ page import="java.util.*, transferobjects.Vehicle, business.VehicleService" %>
 <!DOCTYPE html>
 <html>

@@ -1,6 +1,26 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, transferobjects.MaintenanceTask, dataaccess.MaintenanceDAO" %>
 <%@ page import="java.time.LocalDate" %>
+
+<%--
+  /**
+   * maintenanceSchedule.jsp - Maintenance Schedule Management Page
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It provides a form and table interface for managing vehicle maintenance tasks,
+   * including adding, updating, and deleting scheduled maintenance records.
+   *
+   * Features:
+   * - Displays feedback messages for add/update/delete actions
+   * - Validates that only one task is allowed per day (via backend logic)
+   * - Prevents editing/deletion of completed tasks
+   * - Automatically disables/enables buttons based on selection
+   * - JavaScript-assisted form pre-filling when selecting a task from the table
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -40,7 +60,7 @@
     %><div class="message error">Error: Invalid input or server issue.</div><%
         }
     %>
-    
+
     <% if ("duplicate".equals(error)) { %>
     <div class="message error">Only one maintenance task can be scheduled per day. Choose another date.</div>
 <% } %>
@@ -97,11 +117,9 @@
         <table class="styled-table" width="100%">
             <tr>
                 <th>Select</th>
-<!--                <th>ID</th>-->
                 <th>Scheduled</th>
                 <th>Vehicle ID</th>
                 <th>Task Type</th>
-
                 <th>Cost</th>
                 <th>Completed</th>
             </tr>
@@ -110,7 +128,7 @@
                 List<MaintenanceTask> tasks = dao.getAllMaintenanceTasks();
                 for (MaintenanceTask task : tasks) {
                     String dateStr = task.getScheduledDatetime().toLocalDateTime().toLocalDate().toString();
-                    String descEscaped = task.getDescription().replace("'", "\\'");
+                    String descEscaped = task.getDescription().replace("'", "\'");
             %>
             <tr onclick="selectTask('<%= task.getTaskId() %>', '<%= task.getVehicleId() %>', '<%= descEscaped %>', '<%= dateStr %>', '<%= task.getCost() %>', '<%= task.isCompleted() %>')">
                 <td style="text-align: center;">
@@ -118,11 +136,9 @@
                         <input type="radio" name="selectedTask" value="<%= task.getTaskId() %>">
                     <% } %>
                 </td>
-<!--                <td><%= task.getTaskId() %></td>-->
-                                <td><%= dateStr %></td>
+                <td><%= dateStr %></td>
                 <td><%= task.getVehicleId() %></td>
                 <td><%= task.getDescription() %></td>
-
                 <td><%= task.getCost() %></td>
                 <td><%= task.isCompleted() ? "Yes" : "No" %></td>
             </tr>

@@ -1,3 +1,20 @@
+<%--
+  /**
+   * Dashboard.jsp - Main User Dashboard
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It serves as the main landing page after login and displays options 
+   * tailored to the user's role (Manager or Operator).
+   * 
+   * Features:
+   * - Authenticates session to restrict unauthorized access
+   * - Dynamically shows role-based navigation links
+   * - Displays system messages such as access errors or session timeouts
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <%@ page import="transferobjects.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
@@ -8,6 +25,7 @@
         return;
     }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,6 +90,7 @@
     <% } else if ("sessionExpired".equals(error)) { %>
         <div class="message">Session expired. Please log in again.</div>
     <% } %>
+
     <br>
     <ul>
         <% if ("Manager".equalsIgnoreCase(user.getUserType())) { %>
@@ -85,7 +104,6 @@
             <li><a href="breakLog.jsp">Break Log</a></li>
             <li><a href="gpsOperator.jsp" class="btn">GPS Logging</a></li>
             <li><a href="reports.jsp?view=performance">Performance</a></li>
-
         <% } %>
         
         <li><br><a href="logout">Logout</a></li>

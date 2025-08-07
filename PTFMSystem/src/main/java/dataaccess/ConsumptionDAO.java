@@ -5,13 +5,31 @@ import java.util.ArrayList;
 import java.util.List;
 import transferobjects.ConsumptionRecord;
 
+/**
+ * Data Access Object (DAO) for managing ConsumptionRecord objects in the database.
+ * This class handles all database interactions related to consumption data.
+ * * @author Annabel Cheng
+ * @comment CST8288 Lab 013 Final Project
+ */
 public class ConsumptionDAO {
+    /**
+     * The DataSource instance used to get database connections.
+     */
     private final DataSource dataSource;
 
+    /**
+     * Constructs a new ConsumptionDAO and initializes the DataSource instance.
+     */
     public ConsumptionDAO() {
         dataSource = DataSource.getInstance();
     }
 
+    /**
+     * Retrieves all consumption records from the database. This includes vehicle
+     * information joined with consumption log data.
+     * * @return A List of all ConsumptionRecord objects.
+     * @throws SQLException If a database access error occurs.
+     */
     public List<ConsumptionRecord> getAllConsumption() throws SQLException {
         List<ConsumptionRecord> records = new ArrayList<>();
         String query = "SELECT v.vehicle_id, v.vehicle_number, v.vehicle_type, " +

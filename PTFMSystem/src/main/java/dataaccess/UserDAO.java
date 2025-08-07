@@ -4,24 +4,28 @@ import transferobjects.User;
 import java.sql.*;
 
 /**
- * Data Access Object for User entity.
- * Handles CRUD operations for the Users table.
+ * Data Access Object (DAO) for the User entity.
+ * Handles all database operations related to the Users table,
+ * including registration, authentication, and email verification.
+ * 
+ * @author Annabel Cheng
+ * @comment Course 25S CST8288 Lab013 Final Project
  */
 public class UserDAO {
 
     private final DataSource dataSource;
 
     /**
-     * Constructor initializes DataSource using Singleton instance.
+     * Constructs a UserDAO and initializes the DataSource using the Singleton pattern.
      */
     public UserDAO() {
         dataSource = DataSource.getInstance();
     }
 
     /**
-     * Registers a new user in the database.
+     * Registers a new user by inserting their information into the Users table.
      *
-     * @param user User object containing name, email, password, and userType.
+     * @param user The User object containing the user's name, email, password, and user type.
      * @throws SQLException if a database access error occurs.
      */
     public void registerUser(User user) throws SQLException {
@@ -37,11 +41,11 @@ public class UserDAO {
     }
 
     /**
-     * Authenticates a user by email and password.
+     * Authenticates a user by checking their email and password against the database.
      *
-     * @param email    User's email.
-     * @param password User's password (plain text for demo).
-     * @return User object if credentials are correct; null otherwise.
+     * @param email    The email address of the user.
+     * @param password The password of the user (assumes plain text for demo purposes).
+     * @return A User object if the credentials are correct; null otherwise.
      * @throws SQLException if a database access error occurs.
      */
     public User authenticate(String email, String password) throws SQLException {
@@ -66,10 +70,10 @@ public class UserDAO {
     }
 
     /**
-     * Checks if an email is already registered.
+     * Checks if the given email address is already registered in the Users table.
      *
-     * @param email Email to check.
-     * @return true if email exists; false otherwise.
+     * @param email The email address to check.
+     * @return true if the email exists in the database; false otherwise.
      * @throws SQLException if a database access error occurs.
      */
     public boolean emailExists(String email) throws SQLException {
@@ -78,7 +82,7 @@ public class UserDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // true if record found
+                return rs.next();
             }
         }
     }

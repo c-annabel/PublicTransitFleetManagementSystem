@@ -1,13 +1,25 @@
 package transferobjects;
 
+/**
+ * Vehicle.java - Transfer Object representing a Vehicle entity.
+ *
+ * This class is part of the CST8288 Final Project.
+ * It encapsulates vehicle attributes such as ID, number, type, fuel type,
+ * and provides standard getters and setters for data access and manipulation.
+ *
+ * Used across the data access layer and business logic for vehicle management.
+ * 
+ * @author Annabel Cheng
+ */
+
 public class Vehicle {
-    private int vehicleId;
-    private String vehicleNumber;
-    private String vehicleType;
-    private String fuelType;
-    private double consumptionRate;
-    private int maxPassengers;
-    private int routeId;
+    private final int vehicleId;
+    private final String vehicleNumber;
+    private final String vehicleType;
+    private final String fuelType;
+    private final double consumptionRate;
+    private final int maxPassengers;
+    private final int routeId;
 
     // ✅ Private constructor to enforce Builder usage
     private Vehicle(Builder builder) {

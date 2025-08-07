@@ -1,5 +1,25 @@
 <%@ page import="transferobjects.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%--
+  /**
+   * reports.jsp - Reports & Analytics Page
+   *
+   * This JSP page is part of the CST8288 Final Project.
+   * It provides Managers with filtered visual analytics (charts) on 
+   * maintenance counts, costs, and fuel expenses, and allows Operators 
+   * to view personal performance statistics.
+   *
+   * Features:
+   * - Role-based view: Manager (charts) and Operator (performance)
+   * - Uses Chart.js for rendering pie, line, and bar charts
+   * - Fetches dynamic data from ReportServlet
+   * - Displays error messages or defaults if data fails to load
+   *
+   * @author Annabel Cheng
+   */
+--%>
+
 <%
     User user = (User) session.getAttribute("user");
     if (user == null) {
@@ -38,9 +58,6 @@
     <h2>Reports & Analytics</h2>
 
     <% if ("Manager".equalsIgnoreCase(userType)) { %>
-    <!-- ============================= -->
-    <!-- MANAGER VIEW -->
-    <!-- ============================= -->
     <div class="filters">
         <label for="monthSelect" style="margin-right: 10px;">Select Month:</label>
         <div style="display: inline-flex; align-items: center; gap: 8px;">
@@ -50,19 +67,16 @@
         </div>
     </div>
 
-    <!-- Maintenance Summary -->
     <div class="chart-section">
         <h3>Maintenance Summary</h3>
         <canvas id="maintenanceSummaryChart"></canvas>
     </div>
 
-    <!-- Maintenance Cost Trend -->
     <div class="chart-section">
         <h3>Maintenance Cost Trend</h3>
         <canvas id="maintenanceTrendChart"></canvas>
     </div>
 
-    <!-- Cost Analysis -->
     <div class="chart-section">
         <h3>Cost Analysis (Fuel & Maintenance)</h3>
         <canvas id="costAnalysisChart"></canvas>
@@ -76,122 +90,88 @@
         function populateMonthYearDropdowns() {
             const monthSelect = document.getElementById("monthSelect");
             const yearSelect = document.getElementById("yearSelect");
-
-            // Hardcoded: Allow only July and August
-            const months = [
-                { value: 7, name: "July" },
-                { value: 8, name: "August" }
-            ];
-
+            const months = [{ value: 7, name: "July" }, { value: 8, name: "August" }];
             const year = 2025;
-
             months.forEach(month => {
                 const option = document.createElement("option");
                 option.value = month.value;
                 option.text = month.name;
                 monthSelect.appendChild(option);
             });
-
             const yearOption = document.createElement("option");
             yearOption.value = year;
             yearOption.text = year;
             yearSelect.appendChild(yearOption);
-
-            // Set default to July
             monthSelect.value = 7;
             yearSelect.value = 2025;
         }
 
-
         function getSelectedDateRange() {
             const month = parseInt(document.getElementById("monthSelect").value);
             const year = parseInt(document.getElementById("yearSelect").value);
-
             const startDate = new Date(year, month - 1, 1);
-            const endDate = new Date(year, month, 0); // Last day of selected month
-
-            const startStr = startDate.toISOString().split('T')[0];
-            const endStr = endDate.toISOString().split('T')[0];
-            return { startStr, endStr };
+            const endDate = new Date(year, month, 0);
+            return {
+                startStr: startDate.toISOString().split('T')[0],
+                endStr: endDate.toISOString().split('T')[0]
+            };
         }
-        
+
         let chartSummary = null;
         let chartTrend = null;
         let chartCost = null;
 
-function loadReports() {
-    const { startStr, endStr } = getSelectedDateRange();
+        function loadReports() {
+            const { startStr, endStr } = getSelectedDateRange();
 
-    // Maintenance Summary
-    fetch('<%=request.getContextPath()%>/ReportServlet?action=maintenance&startDate=' + startStr + '&endDate=' + endStr)
-        .then(response => response.json())
-        .then(data => {
-            if (chartSummary) chartSummary.destroy(); // 🔁 Destroy previous instance
-            if (chartTrend) chartTrend.destroy();
-
-            if (data.labels && data.values) {
-                chartSummary = new Chart(ctxSummary, {
-                    type: 'pie',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            data: data.values,
-                            backgroundColor: ['#28a745', '#dc3545']
-                        }]
+            fetch('<%=request.getContextPath()%>/ReportServlet?action=maintenance&startDate=' + startStr + '&endDate=' + endStr)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartSummary) chartSummary.destroy();
+                    if (chartTrend) chartTrend.destroy();
+                    if (data.labels && data.values) {
+                        chartSummary = new Chart(ctxSummary, {
+                            type: 'pie',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{ data: data.values, backgroundColor: ['#28a745', '#dc3545'] }]
+                            }
+                        });
+                    }
+                    if (data.trend && data.trend.labels && data.trend.values) {
+                        chartTrend = new Chart(ctxTrend, {
+                            type: 'line',
+                            data: {
+                                labels: data.trend.labels,
+                                datasets: [{ label: 'Maintenance Cost ($)', data: data.trend.values, borderColor: '#007bff', fill: false }]
+                            }
+                        });
                     }
                 });
-            }
 
-            if (data.trend && data.trend.labels && data.trend.values) {
-                chartTrend = new Chart(ctxTrend, {
-                    type: 'line',
-                    data: {
-                        labels: data.trend.labels,
-                        datasets: [{
-                            label: 'Maintenance Cost ($)',
-                            data: data.trend.values,
-                            borderColor: '#007bff',
-                            fill: false
-                        }]
+            fetch('<%=request.getContextPath()%>/ReportServlet?action=cost&startDate=' + startStr + '&endDate=' + endStr)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartCost) chartCost.destroy();
+                    if (data.labels && data.values) {
+                        chartCost = new Chart(ctxCost, {
+                            type: 'bar',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{ label: 'Cost ($)', data: data.values, backgroundColor: ['#17a2b8', '#ffc107'] }]
+                            }
+                        });
                     }
                 });
-            }
-        });
+        }
 
-    // Cost Analysis
-    fetch('<%=request.getContextPath()%>/ReportServlet?action=cost&startDate=' + startStr + '&endDate=' + endStr)
-        .then(response => response.json())
-        .then(data => {
-            if (chartCost) chartCost.destroy(); // 🔁 Destroy previous instance
-
-            if (data.labels && data.values) {
-                chartCost = new Chart(ctxCost, {
-                    type: 'bar',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'Cost ($)',
-                            data: data.values,
-                            backgroundColor: ['#17a2b8', '#ffc107']
-                        }]
-                    }
-                });
-            }
-        });
-}
-
-
-        // === Init ===
         document.addEventListener("DOMContentLoaded", function () {
             populateMonthYearDropdowns();
-            loadReports(); // default to last month
+            loadReports();
         });
     </script>
 
     <% } else if ("Operator".equalsIgnoreCase(userType)) { %>
-    <!-- ============================= -->
-    <!-- OPERATOR VIEW -->
-    <!-- ============================= -->
     <div class="performance-card">
         <h3>Loading Performance...</h3>
     </div>

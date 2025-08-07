@@ -4,19 +4,46 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) for generating reports from the database.
+ * This class contains methods to retrieve summarized data for various reports
+ * such as maintenance summaries, cost trends, and operator performance.
+ *
+ * @author Annabel Cheng
+ * @comment CST8288 Lab 013 Final Project
+ */
 public class ReportDAO {
+    /**
+     * The DataSource instance used to get database connections.
+     */
     private final DataSource dataSource;
 
+    /**
+     * Constructs a new ReportDAO and initializes the DataSource instance.
+     */
     public ReportDAO() {
         dataSource = DataSource.getInstance();
     }
 
+    /**
+     * Provides a database connection from the DataSource.
+     *
+     * @return A new database connection.
+     * @throws SQLException if a database access error occurs.
+     */
     private Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 
     
-    // ================= Maintenance Summary =================
+    /**
+     * Retrieves a summary of completed and pending maintenance tasks within a specified date range.
+     *
+     * @param startDate The start date of the reporting period (inclusive). Can be null or empty to represent the beginning of time.
+     * @param endDate The end date of the reporting period (inclusive). Can be null or empty to represent the end of time.
+     * @return A double array where the first element is the count of completed tasks and the second is the count of pending tasks.
+     * @throws SQLException if a database access error occurs.
+     */
     public double[] getMaintenanceSummary(String startDate, String endDate) throws SQLException {
         System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
 
@@ -41,7 +68,15 @@ public class ReportDAO {
         return new double[]{0, 0};
     }
 
-    // ================= Maintenance Cost Trend =================
+    /**
+     * Retrieves a list of unique dates for maintenance costs within a specified date range,
+     * ordered by date.
+     *
+     * @param startDate The start date of the reporting period. Can be null or empty.
+     * @param endDate The end date of the reporting period. Can be null or empty.
+     * @return An array of String labels representing the dates.
+     * @throws SQLException if a database access error occurs.
+     */
     public String[] getMaintenanceCostLabels(String startDate, String endDate) throws SQLException {
         System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
 
@@ -66,6 +101,14 @@ public class ReportDAO {
         return labels.toArray(new String[0]);
     }
 
+    /**
+     * Retrieves the total maintenance costs for each unique date within a specified date range.
+     *
+     * @param startDate The start date of the reporting period. Can be null or empty.
+     * @param endDate The end date of the reporting period. Can be null or empty.
+     * @return A double array of maintenance cost values.
+     * @throws SQLException if a database access error occurs.
+     */
     public double[] getMaintenanceCostValues(String startDate, String endDate) throws SQLException {
         System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
 
@@ -90,11 +133,23 @@ public class ReportDAO {
         return values.stream().mapToDouble(Double::doubleValue).toArray();
     }
 
-    // ================= Cost Analysis =================
+    /**
+     * Provides labels for a cost analysis report.
+     *
+     * @return A String array with the labels "Fuel" and "Maintenance".
+     */
     public String[] getCostAnalysisLabels() {
         return new String[]{"Fuel", "Maintenance"};
     }
 
+    /**
+     * Retrieves the total fuel and maintenance costs within a specified date range.
+     *
+     * @param startDate The start date of the reporting period.
+     * @param endDate The end date of the reporting period.
+     * @return A double array where the first element is the total fuel cost and the second is the total maintenance cost.
+     * @throws SQLException if a database access error occurs.
+     */
     public double[] getCostAnalysisValues(String startDate, String endDate) throws SQLException {
         System.out.println("Executing getMaintenanceSummary with dates: " + startDate + " to " + endDate);
 
@@ -141,7 +196,13 @@ public class ReportDAO {
         return new double[]{fuelCost, maintenanceCost};
     }
 
-    // ================= Operator Performance =================
+    /**
+     * Calculates the on-time arrival rate for a specific operator.
+     *
+     * @param operatorId The ID of the operator.
+     * @return The on-time arrival rate as a percentage, or 0.0 if no relevant data is found.
+     * @throws SQLException if a database access error occurs.
+     */
     public double getOnTimeRate(int operatorId) throws SQLException {
         String sql = "SELECT (COUNT(CASE WHEN g.arrival_time <= t.planned_arrival_time THEN 1 END) * 100.0 / COUNT(*)) AS rate " +
                 "FROM GPSLogs g " +
@@ -160,6 +221,13 @@ public class ReportDAO {
         return 0.0;
     }
 
+    /**
+     * Calculates the average efficiency score for a specific operator.
+     *
+     * @param operatorId The ID of the operator.
+     * @return The average efficiency score as a percentage, or 0.0 if no relevant data is found.
+     * @throws SQLException if a database access error occurs.
+     */
     public double getEfficiencyScore(int operatorId) throws SQLException {
         String sql = "SELECT AVG(percentage) AS efficiency FROM ( " +
                 " SELECT CASE WHEN planned_count > 0 THEN (actual_count * 100.0 / planned_count) ELSE 0 END AS percentage " +

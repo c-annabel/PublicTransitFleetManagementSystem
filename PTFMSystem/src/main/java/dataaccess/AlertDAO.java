@@ -3,15 +3,34 @@ package dataaccess;
 import transferobjects.Alert;
 import java.sql.*;
 
+/**
+ * Data Access Object (DAO) for managing Alert objects in the database.
+ * This class handles all database interactions related to alerts, such as
+ * retrieving, inserting, and updating alert information.
+ *
+ * @author Annabel Cheng
+ * @comment CST8288 Lab 013 Final Project
+ */
 public class AlertDAO {
 
+    /**
+     * The DataSource instance used to get database connections.
+     */
     private final DataSource dataSource;
 
+    /**
+     * Constructs a new AlertDAO and initializes the DataSource instance.
+     */
     public AlertDAO() {
         dataSource = DataSource.getInstance();
     }
 
-    // ✅ Check if an unresolved maintenance alert exists for this vehicle
+    /**
+     * Retrieves the ID of an existing, unresolved maintenance alert for a specific vehicle.
+     *
+     * @param vehicleId The ID of the vehicle to check for an alert.
+     * @return The alert ID if an unresolved maintenance alert exists, otherwise -1.
+     */
     public int getExistingAlertId(int vehicleId) {
         String sql = "SELECT alert_id FROM Alerts WHERE vehicle_id=? AND alert_type='Maintenance' AND resolved=FALSE";
         try (Connection conn = dataSource.getConnection();
@@ -28,7 +47,12 @@ public class AlertDAO {
         return -1;
     }
 
-    // ✅ Insert a new maintenance alert and return its ID
+    /**
+     * Inserts a new alert into the database.
+     *
+     * @param alert The Alert object containing the data to be inserted.
+     * @return The auto-generated ID of the newly inserted alert, or -1 if the insertion failed.
+     */
     public int insertAlert(Alert alert) {
         String sql = "INSERT INTO Alerts (vehicle_id, alert_type, alert_message, severity) VALUES (?,?,?,?)";
         try (Connection conn = dataSource.getConnection();
@@ -50,7 +74,12 @@ public class AlertDAO {
         return -1;
     }
 
-    // ✅ Mark alert as resolved after booking
+    /**
+     * Marks an alert as resolved in the database.
+     *
+     * @param alertId The ID of the alert to be resolved.
+     * @return {@code true} if the alert was successfully marked as resolved, {@code false} otherwise.
+     */
     public boolean resolveAlert(int alertId) {
         String sql = "UPDATE Alerts SET resolved = TRUE WHERE alert_id = ?";
         try (Connection conn = dataSource.getConnection();

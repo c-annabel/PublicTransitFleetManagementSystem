@@ -4,27 +4,39 @@ import dataaccess.UserDAO;
 import transferobjects.User;
 
 /**
- * Service layer for user-related operations.
- * Handles validation and delegates persistence to UserDAO.
+ * Service layer for user-related operations such as registration and authentication.
+ * Handles input validation and delegates persistence tasks to {@link UserDAO}.
+ * 
+ * @author Annabel Cheng
+ * Course 25S CST8288 Lab013 Final Project
  */
 public class UserService {
     private final UserDAO userDAO;
 
-    // Dependency Injection (can be replaced with frameworks later)
+    /**
+     * Default constructor that initializes the service with a new {@link UserDAO} instance.
+     */
     public UserService() {
         this.userDAO = new UserDAO();
     }
 
-    // For future testability, allow passing a mock DAO
+    /**
+     * Constructor that allows injection of a custom {@link UserDAO} instance.
+     * Useful for testing or mocking.
+     *
+     * @param userDAO the {@code UserDAO} instance to be used by this service
+     */
     public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
     /**
-     * Registers a new user after performing validations.
+     * Registers a new user after performing validations on the input fields.
+     * Ensures that name, email, password, and user type are not empty,
+     * and that the email does not already exist in the database.
      *
-     * @param user User object with registration details.
-     * @throws Exception if validation fails or duplicate email found.
+     * @param user User object containing the registration details.
+     * @throws Exception if validation fails or the email is already registered.
      */
     public void register(User user) throws Exception {
         // Validation for empty fields
@@ -55,11 +67,12 @@ public class UserService {
     }
 
     /**
-     * Authenticates a user by email and password.
+     * Authenticates a user using the provided email and password.
+     * Validates that both fields are not empty before querying the database.
      *
-     * @param email User email.
-     * @param password User password.
-     * @return User object if authentication is successful.
+     * @param email the email address entered by the user.
+     * @param password the password entered by the user.
+     * @return the {@code User} object if authentication is successful.
      * @throws Exception if input is invalid or credentials are incorrect.
      */
     public User login(String email, String password) throws Exception {
