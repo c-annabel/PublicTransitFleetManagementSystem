@@ -79,6 +79,7 @@
             <li><a href="gpsOperator.jsp">GPS Tracking Report</a></li>
             <li><a href="monitoring.jsp">Fuel/Energy Monitor</a></li>
             <li><a href="alertsMaintenance.jsp">Vehicle System Monitor</a></li>
+            <li><a href="maintenanceSchedule.jsp">Maintenance Schedule</a></li>
             <li><a href="reports.jsp">Reports</a></li>
         <% } else { %>
             <li><a href="breakLog.jsp">Break Log</a></li>

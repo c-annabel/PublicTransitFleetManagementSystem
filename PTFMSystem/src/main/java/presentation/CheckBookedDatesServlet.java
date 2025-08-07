@@ -29,7 +29,17 @@ public class CheckBookedDatesServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            List<LocalDate> bookedDates = maintenanceDAO.getAllBookedDates();
+      
+           List<LocalDate> bookedDates;
+           
+            String vehicleIdParam = request.getParameter("vehicleId");
+            
+            if (vehicleIdParam != null && !vehicleIdParam.isEmpty()) {
+                int vehicleId = Integer.parseInt(vehicleIdParam);
+                bookedDates = maintenanceDAO.getBookedDatesForVehicle(vehicleId); // ⬅️ new DAO method (see below)
+            } else {
+                bookedDates = maintenanceDAO.getAllBookedDates(); // ⬅️ fallback to existing behavior
+            }
 
             StringBuilder json = new StringBuilder();
             json.append("[");
