@@ -116,6 +116,7 @@ function openBookingModal(vehicleId, alertId) {
     document.getElementById('scheduleDate').min = minDate;
     document.getElementById('scheduleDate').value = minDate;
 
+    disableBookedDates();
     document.getElementById('bookingModal').style.display = 'block';
 }
 
@@ -123,30 +124,39 @@ function closeBookingModal() {
     document.getElementById('bookingModal').style.display = 'none';
 }
 
-
 function disableBookedDates() {
     fetch('check-booked-dates')
         .then(res => res.json())
         .then(bookedDates => {
+            console.log("Booked dates received:", bookedDates);
+    
+            window.bookedDates = bookedDates; 
+
             const dateInput = document.getElementById('scheduleDate');
 
-            dateInput.addEventListener('input', function () {
-                const selected = this.value;
-                if (bookedDates.includes(selected)) {
+            // Attach listener after setting available dates
+            dateInput.onchange = function () {
+                const selected = this.value.trim();
+                console.log("User selected date:", selected);
+                console.log("Booked dates:", bookedDates);
+
+                const isBooked = bookedDates.some(date => date.trim() === selected);       
+                
+                if (isBooked) {
                     alert("This date is already booked. Please choose another.");
-                    this.value = '';
+                    this.value = '';  // Clear the invalid date
                 }
-            });
+            };
         })
         .catch(err => console.error("Error loading booked dates:", err));
 }
 
-// Call this when the modal opens:
-document.addEventListener('click', function(e) {
-    if (e.target && e.target.dataset.action === 'book') {
-        disableBookedDates();
-    }
-});
+//// Call this when the modal opens:
+//document.addEventListener('click', function(e) {
+//    if (e.target && e.target.dataset.action === 'book') {
+//        disableBookedDates();
+//    }
+//});
 
 
 // AJAX Booking
@@ -156,6 +166,12 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
     const date = formData.get('scheduleDate');
     if (!date) {
         alert("Please select a valid date.");
+        return;
+    }
+    
+        // ✅ Double-check against booked dates before submitting
+    if (window.bookedDates && window.bookedDates.includes(date.trim())) {
+        alert("This date is already booked. Please choose another.");
         return;
     }
 

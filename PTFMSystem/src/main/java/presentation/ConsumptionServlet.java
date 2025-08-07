@@ -3,6 +3,7 @@ package presentation;
 import business.ConsumptionService;
 import dataaccess.ConsumptionDAO;
 import dataaccess.VehicleConfigDAO;
+import dataaccess.DiagnosticsDAO;
 import transferobjects.ConsumptionRecord;
 
 import jakarta.servlet.*;
@@ -20,6 +21,7 @@ public class ConsumptionServlet extends HttpServlet {
     private ConsumptionService consumptionService;
     private ConsumptionDAO consumptionDAO;
     private VehicleConfigDAO configDAO;
+    private DiagnosticsDAO diagnosticsDAO;
 
     @Override
     public void init() throws ServletException {
@@ -28,6 +30,7 @@ public class ConsumptionServlet extends HttpServlet {
         consumptionService.registerManager("Transit Manager");
         consumptionDAO = new ConsumptionDAO();
         configDAO = new VehicleConfigDAO();
+        diagnosticsDAO = new DiagnosticsDAO();
     }
 
     @Override
@@ -37,6 +40,8 @@ public class ConsumptionServlet extends HttpServlet {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         consumptionService.clearAlerts();
+
+        // === FUEL & ENERGY MONITORING TABLE ===
         out.println("<h3>Real-Time Fuel & Energy Monitoring</h3>");
         out.println("<table style='width:100%; border-collapse: collapse;' border='1'>");
         out.println("<thead><tr style='background:#f2f2f2;'>"
@@ -45,17 +50,11 @@ public class ConsumptionServlet extends HttpServlet {
                 + "<th>Consumption (per 100km)</th></tr></thead><tbody>");
 
         try {
-            
-            // Fetch all consumption records
             List<ConsumptionRecord> records = consumptionDAO.getAllConsumption();
-
-            // Fetch thresholds for each vehicle type
             Map<String, Double> thresholds = configDAO.getThresholds();
 
             for (ConsumptionRecord record : records) {
                 double threshold = thresholds.getOrDefault(record.getVehicleType(), 0.0);
-
-                // Calculate consumption and check against threshold
                 double actualConsumption = consumptionService.calculateAndCheck(
                         record.getVehicleType(),
                         record.getVehicleNumber(),
@@ -80,16 +79,16 @@ public class ConsumptionServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        out.println("</tbody></table>");
+        out.println("</tbody></table><br><br>");
 
-        // ✅ Alerts popup logic
-          List<String> alerts = consumptionService.getAlertMessages();
-          if (!alerts.isEmpty()) {
-              out.println("<div id='hiddenAlerts' style='display:none;'>");
-              for (String msg : alerts) {
-                  out.println(msg + "|"); // separate with |
-              }
-              out.println("</div>");
-          }
+        // === Alerts from fuel monitor ===
+        List<String> alerts = consumptionService.getAlertMessages();
+        if (!alerts.isEmpty()) {
+            out.println("<div id='hiddenAlerts' style='display:none;'>");
+            for (String msg : alerts) {
+                out.println(msg + "|");
+            }
+            out.println("</div>");
+        }
     }
 }

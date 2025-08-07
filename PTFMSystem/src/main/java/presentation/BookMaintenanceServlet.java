@@ -41,11 +41,6 @@ public class BookMaintenanceServlet extends HttpServlet {
             String taskType = request.getParameter("taskType");
             String scheduleDate = request.getParameter("scheduleDate");
 
-            System.out.println("DEBUG Params: alertId=" + alertIdStr +
-                    ", vehicleId=" + vehicleIdStr +
-                    ", taskType=" + taskType +
-                    ", scheduleDate=" + scheduleDate);
-
             // ✅ Validate input
             if (isEmpty(alertIdStr) || isEmpty(vehicleIdStr) || isEmpty(taskType) || isEmpty(scheduleDate)) {
                 sendJson(out, "error", "Missing required fields");

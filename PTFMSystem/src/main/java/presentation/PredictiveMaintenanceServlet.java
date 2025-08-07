@@ -24,6 +24,10 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
     private static final double ENGINE_HEALTH_THRESHOLD = 80.0;
     private static final double PANTOGRAPH_THRESHOLD = 85.0;
     private static final double CATENARY_THRESHOLD = 85.0;
+    private static final double BRAKE_CONDITION_THRESHOLD = 70.0;
+    private static final double TIRE_CONDITION_THRESHOLD = 70.0;
+    private static final double AXLE_CONDITION_THRESHOLD = 70.0;
+    private static final double HOURS_USED_THRESHOLD = 1000.0;
 
     @Override
     public void init() throws ServletException {
@@ -44,6 +48,10 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 + "<th>Vehicle ID</th>"
                 + "<th>Type</th>"
                 + "<th>Engine Health</th>"
+                + "<th>Hours Used</th>"
+                + "<th>Brake Condition</th>"
+                + "<th>Tire Condition</th>"
+                + "<th>Axle Condition</th>"
                 + "<th>Catenary</th>"
                 + "<th>Pantograph</th>"
                 + "<th>Circuit Breaker</th>"
@@ -54,22 +62,30 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
         StringBuilder alertPopup = new StringBuilder();
 
         try {
-            List<DiagnosticsLog> logs = diagnosticsDAO.getLatestDiagnosticsWithType();
+            List<DiagnosticsLog> logs = diagnosticsDAO.getLatestDiagnosticsWithUsage();
 
             for (DiagnosticsLog log : logs) {
                 int vehicleId = log.getVehicleId();
                 String vehicleType = log.getVehicleType();
+
                 BigDecimal engineHealth = log.getEngineHealth();
                 BigDecimal pantograph = log.getPantographCondition();
                 BigDecimal catenary = log.getCatenaryCondition();
+                BigDecimal circuitBreaker = log.getCircuitBreakerCondition();
+
+                BigDecimal brakeCond = log.getBrakeCondition();
+                BigDecimal tireCond = log.getTireCondition();
+                BigDecimal axleCond = log.getAxleCondition();
+                BigDecimal hoursUsed = log.getHoursUsed();
 
                 String status = "OK";
                 String alertMsg = null;
 
+                // 🔧 Threshold check logic
                 if ("Diesel Bus".equalsIgnoreCase(vehicleType)) {
                     if (engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD) {
                         status = "Needs Maintenance";
-                        alertMsg = "Diesel Bus (ID: " + vehicleId + ") engine health below 80%";
+                        alertMsg = "Diesel Bus (ID: " + vehicleId + ") engine health below threshold";
                     }
                 } else if ("Diesel-Electric Train".equalsIgnoreCase(vehicleType)) {
                     if ((engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD)
@@ -85,12 +101,26 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                     }
                 }
 
+                // ✅ Additional wear-based checks
+                if (brakeCond != null && brakeCond.doubleValue() < BRAKE_CONDITION_THRESHOLD) {
+                    status = "Needs Maintenance";
+                    alertMsg = "Vehicle (ID: " + vehicleId + ") brake wear below threshold";
+                } else if (tireCond != null && tireCond.doubleValue() < TIRE_CONDITION_THRESHOLD) {
+                    status = "Needs Maintenance";
+                    alertMsg = "Vehicle (ID: " + vehicleId + ") tire wear below threshold";
+                } else if (axleCond != null && axleCond.doubleValue() < AXLE_CONDITION_THRESHOLD) {
+                    status = "Needs Maintenance";
+                    alertMsg = "Vehicle (ID: " + vehicleId + ") axle wear below threshold";
+                } else if (hoursUsed != null && hoursUsed.doubleValue() > HOURS_USED_THRESHOLD) {
+                    status = "Needs Maintenance";
+                    alertMsg = "Vehicle (ID: " + vehicleId + ") has exceeded recommended usage hours";
+                }
+
                 int alertId = -1;
                 boolean hasExistingTask = false;
 
-                if (alertMsg != null) {
+                if ("Needs Maintenance".equals(status) && alertMsg != null) {
                     alertId = alertDAO.getExistingAlertId(vehicleId);
-
                     if (alertId == -1) {
                         Alert alert = new Alert();
                         alert.setVehicleId(vehicleId);
@@ -110,15 +140,17 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 out.println("<td>" + vehicleId + "</td>");
                 out.println("<td>" + vehicleType + "</td>");
                 out.println("<td>" + (engineHealth != null ? engineHealth : "-") + "</td>");
+                out.println("<td>" + (hoursUsed != null ? hoursUsed : "-") + "</td>");
+                out.println("<td>" + (brakeCond != null ? brakeCond : "-") + "</td>");
+                out.println("<td>" + (tireCond != null ? tireCond : "-") + "</td>");
+                out.println("<td>" + (axleCond != null ? axleCond : "-") + "</td>");
                 out.println("<td>" + (catenary != null ? catenary : "-") + "</td>");
                 out.println("<td>" + (pantograph != null ? pantograph : "-") + "</td>");
-                out.println("<td>" + (log.getCircuitBreakerCondition() != null ? log.getCircuitBreakerCondition() : "-") + "</td>");
+                out.println("<td>" + (circuitBreaker != null ? circuitBreaker : "-") + "</td>");
                 out.println("<td>" + status + "</td>");
 
                 if ("Needs Maintenance".equals(status) && !hasExistingTask) {
-                    out.println("<td>");
-                    out.println("<button type='button' data-action='book' data-vehicle-id='" + vehicleId + "' data-alert-id='" + alertId + "'>Book</button>");
-                    out.println("</td>");
+                    out.println("<td><button type='button' data-action='book' data-vehicle-id='" + vehicleId + "' data-alert-id='" + alertId + "'>Book</button></td>");
                 } else {
                     out.println("<td>-</td>");
                 }
@@ -133,7 +165,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            out.println("<tr><td colspan='8'>Error loading data</td></tr>");
+            out.println("<tr><td colspan='12'>Error loading data</td></tr>");
             e.printStackTrace();
         }
     }
