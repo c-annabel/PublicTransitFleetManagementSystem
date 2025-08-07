@@ -17,31 +17,79 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Servlet responsible for handling maintenance bookings triggered by alerts.
+ * 
+ * This servlet validates parameters, checks scheduling rules, computes task cost,
+ * persists the task in the database, resolves the related alert, and returns
+ * a JSON response.
+ * 
+ * URL mapping: {@code /book-maintenance}
+ * 
+ * Expected POST parameters:
+ * <ul>
+ *   <li>{@code alertId} – the associated alert ID</li>
+ *   <li>{@code vehicleId} – the ID of the vehicle needing maintenance</li>
+ *   <li>{@code taskType} – the type of maintenance (used to calculate cost)</li>
+ *   <li>{@code scheduleDate} – the selected maintenance date (YYYY-MM-DD)</li>
+ * </ul>
+ * 
+ * Returns a JSON response indicating success or failure.
+ * 
+ * Example success response:
+ * <pre>
+ * {
+ *   "status": "success",
+ *   "scheduledDatetime": "2025-08-12 09:00:00",
+ *   "taskId": 18
+ * }
+ * </pre>
+ * 
+ * Example error response:
+ * <pre>
+ * {
+ *   "status": "error",
+ *   "message": "This vehicle is already booked on that date."
+ * }
+ * </pre>
+ * 
+ * @author Annabel Cheng
+ * @course Course 25S CST8288 Lab013 Final Project
+ */
 @WebServlet("/book-maintenance")
 public class BookMaintenanceServlet extends HttpServlet {
 
     private MaintenanceDAO maintenanceDAO;
     private AlertDAO alertDAO;
 
+    /**
+     * Initializes DAOs used by this servlet.
+     */
     @Override
     public void init() throws ServletException {
         maintenanceDAO = new MaintenanceDAO();
         alertDAO = new AlertDAO();
     }
 
+    /**
+     * Handles POST requests to schedule a maintenance task.
+     *
+     * @param request  the incoming HTTP request with booking parameters
+     * @param response the HTTP response to be returned as JSON
+     * @throws IOException if an I/O error occurs during processing
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
         try {
-            // ✅ Get parameters
+            // Get and validate parameters
             String alertIdStr = request.getParameter("alertId");
             String vehicleIdStr = request.getParameter("vehicleId");
             String taskType = request.getParameter("taskType");
             String scheduleDate = request.getParameter("scheduleDate");
 
-            // ✅ Validate input
             if (isEmpty(alertIdStr) || isEmpty(vehicleIdStr) || isEmpty(taskType) || isEmpty(scheduleDate)) {
                 sendJson(out, "error", "Missing required fields");
                 return;
@@ -57,7 +105,7 @@ public class BookMaintenanceServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Ensure date is at least 2 days ahead
+            // Validate date is at least 2 days ahead
             LocalDate selectedDate = LocalDate.parse(scheduleDate);
             LocalDate minAllowedDate = LocalDate.now().plusDays(2);
             if (selectedDate.isBefore(minAllowedDate)) {
@@ -65,27 +113,27 @@ public class BookMaintenanceServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Check if already booked
+            // Check if date is already booked
             if (maintenanceDAO.isDateAlreadyBooked(vehicleId, selectedDate)) {
                 sendJson(out, "error", "This vehicle is already booked on that date.");
                 return;
             }
 
-            // ✅ Default time is 09:00
+            // Construct full timestamp (09:00)
             String dateTimeStr = scheduleDate + " 09:00:00";
             Timestamp scheduledTimestamp = Timestamp.valueOf(dateTimeStr);
 
-            // ✅ Check if scheduled time is still in the future
+            // Ensure time is still in the future
             Timestamp now = Timestamp.valueOf(LocalDateTime.now());
             if (scheduledTimestamp.before(now)) {
                 sendJson(out, "error", "Cannot book maintenance in the past");
                 return;
             }
 
-            // ✅ Calculate cost based on task
+            // Compute task cost
             double cost = getTaskCost(taskType);
 
-            // ✅ Insert maintenance task
+            // Create and persist MaintenanceTask
             MaintenanceTask task = new MaintenanceTask();
             task.setVehicleId(vehicleId);
             task.setAlertId(alertId);
@@ -96,10 +144,7 @@ public class BookMaintenanceServlet extends HttpServlet {
 
             int taskId = maintenanceDAO.insertMaintenanceTask(task);
             if (taskId > 0) {
-                // ✅ Resolve the alert
                 alertDAO.resolveAlert(alertId);
-
-                // ✅ Respond with success
                 sendJsonSuccess(out, "success", scheduledTimestamp.toString(), taskId);
             } else {
                 sendJson(out, "error", "Failed to save maintenance task");
@@ -111,18 +156,45 @@ public class BookMaintenanceServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Checks if a string is null or empty after trimming.
+     *
+     * @param val the input string
+     * @return true if empty or null
+     */
     private boolean isEmpty(String val) {
         return val == null || val.trim().isEmpty();
     }
 
+    /**
+     * Sends a generic JSON response with a status and message.
+     *
+     * @param out     the PrintWriter to write to
+     * @param status  the status ("success" or "error")
+     * @param message the response message
+     */
     private void sendJson(PrintWriter out, String status, String message) {
         out.print("{\"status\":\"" + status + "\",\"message\":\"" + message + "\"}");
     }
 
+    /**
+     * Sends a success JSON response containing the scheduled timestamp and task ID.
+     *
+     * @param out      the PrintWriter to write to
+     * @param status   the status ("success")
+     * @param datetime the scheduled timestamp as string
+     * @param taskId   the generated task ID
+     */
     private void sendJsonSuccess(PrintWriter out, String status, String datetime, int taskId) {
         out.print("{\"status\":\"" + status + "\",\"scheduledDatetime\":\"" + datetime + "\",\"taskId\":" + taskId + "}");
     }
 
+    /**
+     * Returns the predefined cost for a given maintenance task type.
+     *
+     * @param taskType the description/type of task
+     * @return the associated cost in dollars
+     */
     private double getTaskCost(String taskType) {
         switch (taskType) {
             case "Engine Check": return 500.00;

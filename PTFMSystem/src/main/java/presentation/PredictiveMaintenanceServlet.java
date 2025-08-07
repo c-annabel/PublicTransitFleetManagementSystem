@@ -14,6 +14,33 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Servlet that performs predictive maintenance analysis using diagnostics data and usage logs.
+ *
+ * It evaluates multiple diagnostic metrics (engine, brake, pantograph, etc.) for each vehicle,
+ * identifies whether maintenance is needed based on predefined thresholds, and either:
+ * <ul>
+ *     <li>Triggers a new alert entry in the system</li>
+ *     <li>Or uses an existing one if present</li>
+ * </ul>
+ * 
+ * If a vehicle is due for maintenance and has no scheduled task, a "Book" button is shown.
+ * 
+ * URL mapping: {@code /predictive-maintenance}
+ * 
+ * Responsibilities:
+ * <ul>
+ *   <li>Retrieve latest diagnostic logs with usage info</li>
+ *   <li>Compare metrics against thresholds</li>
+ *   <li>Insert alert if needed</li>
+ *   <li>Display a table of results and status</li>
+ * </ul>
+ * 
+ * Hidden alerts are appended at the end of the HTML to be handled by the frontend.
+ * 
+ * @author Annabel Cheng
+ * @course CST8288 Lab013 Final Project
+ */
 @WebServlet("/predictive-maintenance")
 public class PredictiveMaintenanceServlet extends HttpServlet {
 
@@ -29,6 +56,11 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
     private static final double AXLE_CONDITION_THRESHOLD = 70.0;
     private static final double HOURS_USED_THRESHOLD = 1000.0;
 
+    /**
+     * Initializes required DAOs.
+     *
+     * @throws ServletException if initialization fails
+     */
     @Override
     public void init() throws ServletException {
         diagnosticsDAO = new DiagnosticsDAO();
@@ -36,6 +68,15 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
         maintenanceDAO = new MaintenanceDAO();
     }
 
+    /**
+     * Handles GET requests by analyzing diagnostics data and generating the HTML table view.
+     * Vehicles that meet failure conditions are flagged, and alerts are managed accordingly.
+     *
+     * @param request  the {@code HttpServletRequest}
+     * @param response the {@code HttpServletResponse}
+     * @throws ServletException if servlet processing fails
+     * @throws IOException      if an I/O error occurs during rendering
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -65,17 +106,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
             List<DiagnosticsLog> logs = diagnosticsDAO.getLatestDiagnosticsWithUsage();
 
             for (DiagnosticsLog log : logs) {
-                
-                System.out.println("Vehicle: " + log.getVehicleId() + " | Type: " + log.getVehicleType()
-                + " | Brake: " + log.getBrakeCondition()
-                + " | Tire: " + log.getTireCondition()
-                + " | Axle: " + log.getAxleCondition()
-                + " | Hours: " + log.getHoursUsed()
-                + " | Engine: " + log.getEngineHealth()
-                + " | Pantograph: " + log.getPantographCondition()
-                + " | Catenary: " + log.getCatenaryCondition());
-                
-                
+                // Vehicle metrics extraction
                 int vehicleId = log.getVehicleId();
                 String vehicleType = log.getVehicleType();
 
@@ -88,11 +119,12 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 BigDecimal axleCond = log.getAxleCondition();
                 BigDecimal hoursUsed = log.getHoursUsed();
 
+                // Decision logic
                 String status = "OK";
                 String alertMsg = null;
                 boolean needsMaintenance = false;
 
-                // All failure checks (first one will set alertMsg)
+                // Determine failures by type
                 if ("Diesel Bus".equalsIgnoreCase(vehicleType)) {
                     if (engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD) {
                         needsMaintenance = true;
@@ -112,6 +144,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                     }
                 }
 
+                // Additional checks
                 if (!needsMaintenance && brakeCond != null && brakeCond.doubleValue() < BRAKE_CONDITION_THRESHOLD) {
                     needsMaintenance = true;
                     alertMsg = "Vehicle (ID: " + vehicleId + ") brake wear below threshold";
@@ -129,13 +162,8 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 int alertId = -1;
                 boolean hasExistingTask = false;
 
+                // If maintenance required, insert or reuse alert
                 if (needsMaintenance && alertMsg != null) {
-                    
-                    if (log.getVehicleId() == 8 || log.getVehicleId() == 9) {
-                    System.out.println("→ Checking maintenance decision for vehicle " + log.getVehicleId());
-                    System.out.println("→ needsMaintenance: " + needsMaintenance);
-                    System.out.println("→ alertMsg: " + alertMsg);
-}
                     status = "Needs Maintenance";
                     alertId = alertDAO.getExistingAlertId(vehicleId);
                     if (alertId == -1) {
@@ -153,7 +181,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                     }
                 }
 
-                // Output row
+                // Render result row
                 out.println("<tr>");
                 out.println("<td>" + vehicleId + "</td>");
                 out.println("<td>" + vehicleType + "</td>");
@@ -166,12 +194,6 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 out.println("<td>" + (pantograph != null ? pantograph : "-") + "</td>");
                 out.println("<td>" + (circuitBreaker != null ? circuitBreaker : "-") + "</td>");
                 out.println("<td>" + status + "</td>");
-
-//                if ("Needs Maintenance".equals(status) && !hasExistingTask) {
-//                    out.println("<td><button type='button' data-action='book' data-vehicle-id='" + vehicleId + "' data-alert-id='" + alertId + "'>Book</button></td>");
-//                } else {
-//                    out.println("<td>-</td>");
-//                }
 
                 if ("Needs Maintenance".equals(status)) {
                     if (!hasExistingTask) {

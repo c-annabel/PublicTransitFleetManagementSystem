@@ -15,6 +15,32 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Servlet that handles real-time fuel and energy consumption monitoring.
+ * 
+ * This servlet retrieves consumption data from the database and displays it
+ * in an HTML table. It also triggers alert messages when consumption exceeds
+ * configured thresholds, using the {@code ConsumptionService}.
+ * 
+ * Alerts are rendered in a hidden HTML element for potential client-side usage.
+ * 
+ * URL mapping: {@code /consumption}
+ * 
+ * Responsibilities:
+ * <ul>
+ *   <li>Fetch vehicle consumption records</li>
+ *   <li>Apply strategy-based consumption calculation</li>
+ *   <li>Compare against thresholds</li>
+ *   <li>Display alerts and diagnostic data</li>
+ * </ul>
+ * 
+ * Requires properly initialized DAOs and threshold settings.
+ * 
+ * Output: HTML table rendered directly in response
+ * 
+ * @author Annabel Cheng
+ * @course Course 25S CST8288 Lab013 Final Project
+ */
 @WebServlet("/consumption")
 public class ConsumptionServlet extends HttpServlet {
 
@@ -23,6 +49,11 @@ public class ConsumptionServlet extends HttpServlet {
     private VehicleConfigDAO configDAO;
     private DiagnosticsDAO diagnosticsDAO;
 
+    /**
+     * Initializes DAOs and registers the manager observer for alert tracking.
+     *
+     * @throws ServletException if initialization fails
+     */
     @Override
     public void init() throws ServletException {
         super.init();
@@ -33,6 +64,15 @@ public class ConsumptionServlet extends HttpServlet {
         diagnosticsDAO = new DiagnosticsDAO();
     }
 
+    /**
+     * Handles GET requests by generating an HTML page that shows real-time consumption data
+     * and hidden alerts if thresholds are exceeded.
+     *
+     * @param request  the {@code HttpServletRequest}
+     * @param response the {@code HttpServletResponse}
+     * @throws ServletException if servlet processing fails
+     * @throws IOException      if I/O error occurs while writing response
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

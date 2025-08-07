@@ -8,12 +8,41 @@ import transferobjects.User;
 
 /**
  * Authentication and Authorization filter for the application.
- * Ensures only logged-in users can access restricted pages,
- * and applies role-based restrictions for Managers and Operators.
+ * 
+ * This filter enforces:
+ * <ul>
+ *   <li>Authentication: Only logged-in users can access restricted pages.</li>
+ *   <li>Authorization: Role-based restrictions prevent Operators from accessing Manager pages.</li>
+ *   <li>Session safety: Validates that a User object exists in session.</li>
+ *   <li>Security: Prevents browser caching of restricted resources.</li>
+ * </ul>
+ * 
+ * Public resources such as login, registration, CSS, and image paths are excluded from filtering.
+ * 
+ * URL Pattern: {@code /*}
+ * 
+ * Redirects to:
+ * <ul>
+ *   <li>{@code login.jsp?error=unauthorized} if not logged in</li>
+ *   <li>{@code login.jsp?error=sessionExpired} if session exists but user is null</li>
+ *   <li>{@code dashboard.jsp?error=noaccess} if unauthorized access by role</li>
+ * </ul>
+ * 
+ * @author Annabel Cheng
+ * @course Course 25S CST8288 Lab013 Final Project
  */
 @WebFilter("/*")
 public class AuthFilter implements Filter {
 
+    /**
+     * Filters incoming requests and enforces authentication and role-based access control.
+     *
+     * @param request  the incoming {@code ServletRequest}
+     * @param response the outgoing {@code ServletResponse}
+     * @param chain    the filter chain for continuing request processing
+     * @throws IOException      if an I/O error occurs
+     * @throws ServletException if a servlet error occurs
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {

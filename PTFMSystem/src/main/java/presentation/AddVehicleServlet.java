@@ -7,10 +7,33 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
+/**
+ * Servlet responsible for handling POST requests to add a new vehicle.
+ * 
+ * This servlet validates form input, constructs a {@code Vehicle} object using
+ * the Builder Pattern, and passes it to the {@code VehicleService} for persistence.
+ * 
+ * It then redirects the user to {@code vehicleManagement.jsp} with a success or error flag.
+ * 
+ * URL mapping: {@code /addVehicle}
+ * 
+ * @author Annabel Cheng
+ * @course Course 25S CST8288 Lab013 Final Project
+ */
 @WebServlet("/addVehicle")
 public class AddVehicleServlet extends HttpServlet {
     private final VehicleService vehicleService = new VehicleService();
 
+    /**
+     * Processes the POST request to add a new vehicle.
+     * Validates required parameters, builds a {@code Vehicle} object,
+     * and delegates insertion to the service layer.
+     *
+     * @param request  the HTTP request containing vehicle form data
+     * @param response the HTTP response used to redirect to the result page
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs during redirection
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

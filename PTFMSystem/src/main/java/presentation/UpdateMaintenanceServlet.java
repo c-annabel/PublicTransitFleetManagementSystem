@@ -14,17 +14,47 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
+/**
+ * Servlet responsible for handling updates to existing maintenance tasks.
+ * 
+ * This servlet enforces:
+ * <ul>
+ *   <li>Read-only vehicle ID</li>
+ *   <li>Validation against completed tasks</li>
+ *   <li>2-day minimum rule for schedule changes</li>
+ *   <li>No duplicate dates across tasks</li>
+ * </ul>
+ * 
+ * If validations pass, it uses the Command pattern to execute the update.
+ * 
+ * URL mapping: {@code /updateMaintenance}
+ * 
+ * @author Annabel Cheng
+ * @course CST8288 Lab013 Final Project
+ */
 @WebServlet("/updateMaintenance")
 public class UpdateMaintenanceServlet extends HttpServlet {
     private MaintenanceDAO dao;
 
+    /**
+     * Initializes the DAO used for maintenance task access.
+     */
     @Override
     public void init() {
         dao = new MaintenanceDAO();
     }
 
+    /**
+     * Handles POST requests to update an existing maintenance task.
+     *
+     * Validates task existence, completion status, schedule conflicts,
+     * and applies the update via command execution.
+     *
+     * @param request  the {@code HttpServletRequest} containing form data
+     * @param response the {@code HttpServletResponse} for redirection
+     * @throws IOException if redirection fails
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
@@ -56,11 +86,11 @@ public class UpdateMaintenanceServlet extends HttpServlet {
                     response.sendRedirect("maintenanceSchedule.jsp?error=duplicate");
                     return;
                 }
-                
+
                 if (dao.isDateAlreadyTaken(scheduledDate)) {
-                   response.sendRedirect("maintenanceSchedule.jsp?error=duplicate");
-                return;
-            }
+                    response.sendRedirect("maintenanceSchedule.jsp?error=duplicate");
+                    return;
+                }
             }
 
             // Set updated values

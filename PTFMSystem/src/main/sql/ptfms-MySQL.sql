@@ -1,3 +1,7 @@
+-- PTFMS Databbase
+-- @author Annabel Cheng
+-- @course Course 25S CST8288 Lab013 Final Project
+
 -- Disable foreign key checks for smooth schema and data load
 SET FOREIGN_KEY_CHECKS=0;
 

@@ -4,32 +4,31 @@ import transferobjects.Alert;
 import java.sql.*;
 
 /**
- * Data Access Object (DAO) for managing Alert objects in the database.
- * This class handles all database interactions related to alerts, such as
- * retrieving, inserting, and updating alert information.
- *
+ * Data Access Object (DAO) for managing {@code Alert} objects in the database.
+ * This class handles all database interactions related to alerts, including
+ * retrieving unresolved alerts, inserting new alerts, and resolving existing ones.
+ * 
+ * It uses a singleton {@code DataSource} for obtaining database connections.
+ * 
  * @author Annabel Cheng
- * @comment CST8288 Lab 013 Final Project
+ * @course Course 25S CST8288 Lab013 Final Project
  */
 public class AlertDAO {
 
-    /**
-     * The DataSource instance used to get database connections.
-     */
     private final DataSource dataSource;
 
     /**
-     * Constructs a new AlertDAO and initializes the DataSource instance.
+     * Constructs a new {@code AlertDAO} and initializes the {@code DataSource} instance.
      */
     public AlertDAO() {
         dataSource = DataSource.getInstance();
     }
 
     /**
-     * Retrieves the ID of an existing, unresolved maintenance alert for a specific vehicle.
+     * Retrieves the ID of an existing unresolved "Maintenance" alert for a specific vehicle.
      *
-     * @param vehicleId The ID of the vehicle to check for an alert.
-     * @return The alert ID if an unresolved maintenance alert exists, otherwise -1.
+     * @param vehicleId the ID of the vehicle to check
+     * @return the alert ID if an unresolved alert exists; otherwise, -1
      */
     public int getExistingAlertId(int vehicleId) {
         String sql = "SELECT alert_id FROM Alerts WHERE vehicle_id=? AND alert_type='Maintenance' AND resolved=FALSE";
@@ -48,10 +47,10 @@ public class AlertDAO {
     }
 
     /**
-     * Inserts a new alert into the database.
+     * Inserts a new alert record into the Alerts table.
      *
-     * @param alert The Alert object containing the data to be inserted.
-     * @return The auto-generated ID of the newly inserted alert, or -1 if the insertion failed.
+     * @param alert the {@code Alert} object containing alert data
+     * @return the auto-generated alert ID if the insert is successful; otherwise, -1
      */
     public int insertAlert(Alert alert) {
         String sql = "INSERT INTO Alerts (vehicle_id, alert_type, alert_message, severity) VALUES (?,?,?,?)";
@@ -75,10 +74,10 @@ public class AlertDAO {
     }
 
     /**
-     * Marks an alert as resolved in the database.
+     * Marks a specific alert as resolved in the database.
      *
-     * @param alertId The ID of the alert to be resolved.
-     * @return {@code true} if the alert was successfully marked as resolved, {@code false} otherwise.
+     * @param alertId the ID of the alert to be marked as resolved
+     * @return {@code true} if the update was successful; {@code false} otherwise
      */
     public boolean resolveAlert(int alertId) {
         String sql = "UPDATE Alerts SET resolved = TRUE WHERE alert_id = ?";

@@ -13,9 +13,42 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Servlet for generating different types of reports based on request parameters.
+ * 
+ * Supported report types include:
+ * <ul>
+ *   <li>maintenance</li>
+ *   <li>cost</li>
+ *   <li>operatorPerformance</li>
+ * </ul>
+ * 
+ * Query parameters:
+ * <ul>
+ *   <li>{@code action} - type of report to generate</li>
+ *   <li>{@code startDate} - start of the date range (optional, format: YYYY-MM-DD)</li>
+ *   <li>{@code endDate} - end of the date range (optional, format: YYYY-MM-DD)</li>
+ *   <li>{@code operatorId} - operator ID for filtering (optional)</li>
+ * </ul>
+ * 
+ * Responds with a JSON object containing the generated report data.
+ * 
+ * URL mapping: {@code /ReportServlet}
+ * 
+ * @author Annabel Cheng
+ * @course CST8288 Lab013 Final Project
+ */
 @WebServlet("/ReportServlet")
 public class ReportServlet extends HttpServlet {
 
+    /**
+     * Handles GET requests to generate and return report data in JSON format.
+     *
+     * @param request  the {@code HttpServletRequest} containing parameters
+     * @param response the {@code HttpServletResponse} for writing JSON output
+     * @throws ServletException if servlet processing fails
+     * @throws IOException      if I/O error occurs while writing the response
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
