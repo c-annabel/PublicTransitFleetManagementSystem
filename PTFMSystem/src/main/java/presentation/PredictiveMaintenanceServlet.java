@@ -65,6 +65,17 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
             List<DiagnosticsLog> logs = diagnosticsDAO.getLatestDiagnosticsWithUsage();
 
             for (DiagnosticsLog log : logs) {
+                
+                System.out.println("Vehicle: " + log.getVehicleId() + " | Type: " + log.getVehicleType()
+                + " | Brake: " + log.getBrakeCondition()
+                + " | Tire: " + log.getTireCondition()
+                + " | Axle: " + log.getAxleCondition()
+                + " | Hours: " + log.getHoursUsed()
+                + " | Engine: " + log.getEngineHealth()
+                + " | Pantograph: " + log.getPantographCondition()
+                + " | Catenary: " + log.getCatenaryCondition());
+                
+                
                 int vehicleId = log.getVehicleId();
                 String vehicleType = log.getVehicleType();
 
@@ -72,7 +83,6 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 BigDecimal pantograph = log.getPantographCondition();
                 BigDecimal catenary = log.getCatenaryCondition();
                 BigDecimal circuitBreaker = log.getCircuitBreakerCondition();
-
                 BigDecimal brakeCond = log.getBrakeCondition();
                 BigDecimal tireCond = log.getTireCondition();
                 BigDecimal axleCond = log.getAxleCondition();
@@ -80,46 +90,53 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
 
                 String status = "OK";
                 String alertMsg = null;
+                boolean needsMaintenance = false;
 
-                // 🔧 Threshold check logic
+                // All failure checks (first one will set alertMsg)
                 if ("Diesel Bus".equalsIgnoreCase(vehicleType)) {
                     if (engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD) {
-                        status = "Needs Maintenance";
+                        needsMaintenance = true;
                         alertMsg = "Diesel Bus (ID: " + vehicleId + ") engine health below threshold";
                     }
                 } else if ("Diesel-Electric Train".equalsIgnoreCase(vehicleType)) {
                     if ((engineHealth != null && engineHealth.doubleValue() < ENGINE_HEALTH_THRESHOLD)
                             || (pantograph != null && pantograph.doubleValue() < PANTOGRAPH_THRESHOLD)) {
-                        status = "Needs Maintenance";
+                        needsMaintenance = true;
                         alertMsg = "Train (ID: " + vehicleId + ") engine or pantograph below threshold";
                     }
                 } else if ("Electric Light Rail".equalsIgnoreCase(vehicleType)) {
                     if ((pantograph != null && pantograph.doubleValue() < PANTOGRAPH_THRESHOLD)
                             || (catenary != null && catenary.doubleValue() < CATENARY_THRESHOLD)) {
-                        status = "Needs Maintenance";
+                        needsMaintenance = true;
                         alertMsg = "Light Rail (ID: " + vehicleId + ") pantograph or catenary below threshold";
                     }
                 }
 
-                // ✅ Additional wear-based checks
-                if (brakeCond != null && brakeCond.doubleValue() < BRAKE_CONDITION_THRESHOLD) {
-                    status = "Needs Maintenance";
+                if (!needsMaintenance && brakeCond != null && brakeCond.doubleValue() < BRAKE_CONDITION_THRESHOLD) {
+                    needsMaintenance = true;
                     alertMsg = "Vehicle (ID: " + vehicleId + ") brake wear below threshold";
-                } else if (tireCond != null && tireCond.doubleValue() < TIRE_CONDITION_THRESHOLD) {
-                    status = "Needs Maintenance";
+                } else if (!needsMaintenance && tireCond != null && tireCond.doubleValue() < TIRE_CONDITION_THRESHOLD) {
+                    needsMaintenance = true;
                     alertMsg = "Vehicle (ID: " + vehicleId + ") tire wear below threshold";
-                } else if (axleCond != null && axleCond.doubleValue() < AXLE_CONDITION_THRESHOLD) {
-                    status = "Needs Maintenance";
+                } else if (!needsMaintenance && axleCond != null && axleCond.doubleValue() < AXLE_CONDITION_THRESHOLD) {
+                    needsMaintenance = true;
                     alertMsg = "Vehicle (ID: " + vehicleId + ") axle wear below threshold";
-                } else if (hoursUsed != null && hoursUsed.doubleValue() > HOURS_USED_THRESHOLD) {
-                    status = "Needs Maintenance";
+                } else if (!needsMaintenance && hoursUsed != null && hoursUsed.doubleValue() > HOURS_USED_THRESHOLD) {
+                    needsMaintenance = true;
                     alertMsg = "Vehicle (ID: " + vehicleId + ") has exceeded recommended usage hours";
                 }
 
                 int alertId = -1;
                 boolean hasExistingTask = false;
 
-                if ("Needs Maintenance".equals(status) && alertMsg != null) {
+                if (needsMaintenance && alertMsg != null) {
+                    
+                    if (log.getVehicleId() == 8 || log.getVehicleId() == 9) {
+                    System.out.println("→ Checking maintenance decision for vehicle " + log.getVehicleId());
+                    System.out.println("→ needsMaintenance: " + needsMaintenance);
+                    System.out.println("→ alertMsg: " + alertMsg);
+}
+                    status = "Needs Maintenance";
                     alertId = alertDAO.getExistingAlertId(vehicleId);
                     if (alertId == -1) {
                         Alert alert = new Alert();
@@ -136,6 +153,7 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                     }
                 }
 
+                // Output row
                 out.println("<tr>");
                 out.println("<td>" + vehicleId + "</td>");
                 out.println("<td>" + vehicleType + "</td>");
@@ -149,8 +167,18 @@ public class PredictiveMaintenanceServlet extends HttpServlet {
                 out.println("<td>" + (circuitBreaker != null ? circuitBreaker : "-") + "</td>");
                 out.println("<td>" + status + "</td>");
 
-                if ("Needs Maintenance".equals(status) && !hasExistingTask) {
-                    out.println("<td><button type='button' data-action='book' data-vehicle-id='" + vehicleId + "' data-alert-id='" + alertId + "'>Book</button></td>");
+//                if ("Needs Maintenance".equals(status) && !hasExistingTask) {
+//                    out.println("<td><button type='button' data-action='book' data-vehicle-id='" + vehicleId + "' data-alert-id='" + alertId + "'>Book</button></td>");
+//                } else {
+//                    out.println("<td>-</td>");
+//                }
+
+                if ("Needs Maintenance".equals(status)) {
+                    if (!hasExistingTask) {
+                        out.println("<td><button type='button' data-action='book' data-vehicle-id='" + vehicleId + "' data-alert-id='" + alertId + "'>Book</button></td>");
+                    } else {
+                        out.println("<td><span style='color:gray;'>Maintenance booked</span></td>");
+                    }
                 } else {
                     out.println("<td>-</td>");
                 }
