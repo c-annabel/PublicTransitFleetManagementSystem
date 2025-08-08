@@ -1,31 +1,33 @@
+<%--
+/**
+ * Reports and Analytics Page.
+ * This page displays different reports and analytics based on the user's role.
+ * If the user is a "Manager", it shows various charts for maintenance and cost analysis.
+ * If the user is an "Operator", it shows their individual performance metrics.
+ * Unauthorized access is redirected to the login page.
+ *
+ * @author Annabel Cheng
+ * @version 1.0
+ * @since 2025-08-07
+ */
+--%>
 <%@ page import="transferobjects.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-<%--
-  /**
-   * reports.jsp - Reports & Analytics Page
-   *
-   * This JSP page is part of the CST8288 Final Project.
-   * It provides Managers with filtered visual analytics (charts) on 
-   * maintenance counts, costs, and fuel expenses, and allows Operators 
-   * to view personal performance statistics.
-   *
-   * Features:
-   * - Role-based view: Manager (charts) and Operator (performance)
-   * - Uses Chart.js for rendering pie, line, and bar charts
-   * - Fetches dynamic data from ReportServlet
-   * - Displays error messages or defaults if data fails to load
-   *
-   * @author Annabel Cheng
-   */
---%>
-
 <%
+    /**
+     * Retrieves the User object from the session.
+     * If the user is not logged in (user is null), it redirects to the login page
+     * with an "unauthorized" error.
+     */
     User user = (User) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect("login.jsp?error=unauthorized");
         return;
     }
+    
+    /**
+     * Gets the user type from the User object to determine which view to display.
+     */
     String userType = user.getUserType();
 %>
 <!DOCTYPE html>
@@ -36,6 +38,7 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* CSS styles for page layout and chart appearance */
         body { font-family: Arial, sans-serif; background: #f4f4f4; background-color: lightcyan; }
         h2 { text-align: center; color: #003366; margin: 20px 0; }
         .filters { text-align: center; margin-bottom: 20px; }
@@ -90,33 +93,45 @@
         function populateMonthYearDropdowns() {
             const monthSelect = document.getElementById("monthSelect");
             const yearSelect = document.getElementById("yearSelect");
-            const months = [{ value: 7, name: "July" }, { value: 8, name: "August" }];
+
+            // Hardcoded: Allow only July and August
+            const months = [
+                { value: 7, name: "July" },
+                { value: 8, name: "August" }
+            ];
+
             const year = 2025;
+
             months.forEach(month => {
                 const option = document.createElement("option");
                 option.value = month.value;
                 option.text = month.name;
                 monthSelect.appendChild(option);
             });
+
             const yearOption = document.createElement("option");
             yearOption.value = year;
             yearOption.text = year;
             yearSelect.appendChild(yearOption);
+
+            // Set default to July
             monthSelect.value = 7;
             yearSelect.value = 2025;
         }
 
+
         function getSelectedDateRange() {
             const month = parseInt(document.getElementById("monthSelect").value);
             const year = parseInt(document.getElementById("yearSelect").value);
-            const startDate = new Date(year, month - 1, 1);
-            const endDate = new Date(year, month, 0);
-            return {
-                startStr: startDate.toISOString().split('T')[0],
-                endStr: endDate.toISOString().split('T')[0]
-            };
-        }
 
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0); // Last day of selected month
+
+            const startStr = startDate.toISOString().split('T')[0];
+            const endStr = endDate.toISOString().split('T')[0];
+            return { startStr, endStr };
+        }
+        
         let chartSummary = null;
         let chartTrend = null;
         let chartCost = null;
@@ -124,50 +139,69 @@
         function loadReports() {
             const { startStr, endStr } = getSelectedDateRange();
 
+            // Maintenance Summary
             fetch('<%=request.getContextPath()%>/ReportServlet?action=maintenance&startDate=' + startStr + '&endDate=' + endStr)
                 .then(response => response.json())
                 .then(data => {
-                    if (chartSummary) chartSummary.destroy();
+                    if (chartSummary) chartSummary.destroy(); // 🔁 Destroy previous instance
                     if (chartTrend) chartTrend.destroy();
+
                     if (data.labels && data.values) {
                         chartSummary = new Chart(ctxSummary, {
                             type: 'pie',
                             data: {
                                 labels: data.labels,
-                                datasets: [{ data: data.values, backgroundColor: ['#28a745', '#dc3545'] }]
+                                datasets: [{
+                                    data: data.values,
+                                    backgroundColor: ['#28a745', '#dc3545']
+                                }]
                             }
                         });
                     }
+
                     if (data.trend && data.trend.labels && data.trend.values) {
                         chartTrend = new Chart(ctxTrend, {
                             type: 'line',
                             data: {
                                 labels: data.trend.labels,
-                                datasets: [{ label: 'Maintenance Cost ($)', data: data.trend.values, borderColor: '#007bff', fill: false }]
+                                datasets: [{
+                                    label: 'Maintenance Cost ($)',
+                                    data: data.trend.values,
+                                    borderColor: '#007bff',
+                                    fill: false
+                                }]
                             }
                         });
                     }
                 });
 
+            // Cost Analysis
             fetch('<%=request.getContextPath()%>/ReportServlet?action=cost&startDate=' + startStr + '&endDate=' + endStr)
                 .then(response => response.json())
                 .then(data => {
-                    if (chartCost) chartCost.destroy();
+                    if (chartCost) chartCost.destroy(); // 🔁 Destroy previous instance
+
                     if (data.labels && data.values) {
                         chartCost = new Chart(ctxCost, {
                             type: 'bar',
                             data: {
                                 labels: data.labels,
-                                datasets: [{ label: 'Cost ($)', data: data.values, backgroundColor: ['#17a2b8', '#ffc107'] }]
+                                datasets: [{
+                                    label: 'Cost ($)',
+                                    data: data.values,
+                                    backgroundColor: ['#17a2b8', '#ffc107']
+                                }]
                             }
                         });
                     }
                 });
         }
 
+
+        // === Init ===
         document.addEventListener("DOMContentLoaded", function () {
             populateMonthYearDropdowns();
-            loadReports();
+            loadReports(); // default to last month
         });
     </script>
 
@@ -176,25 +210,27 @@
         <h3>Loading Performance...</h3>
     </div>
 
+
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('<%=request.getContextPath()%>/ReportServlet?action=operatorPerformance&operatorId=<%=user.getUserId()%>')
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('.performance-card').innerHTML = `
-                        <h2>My Performance</h2>
-                        <h3>On-Time Arrival Rate: ${Number(data.onTimeRate).toFixed(2)}%</h3>
-                        <h3>Efficiency Score: ${Number(data.efficiencyScore).toFixed(2)}%</h3>
-                    `;
-                })
-                .catch(err => {
-                    console.error("Error fetching performance:", err);
-                    document.querySelector('.performance-card').innerHTML = `
-                        <h2>My Performance</h2>
-                        <h3>Error loading data</h3>
-                    `;
-                });
-        });
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('ReportServlet?action=operatorPerformance&operatorId=<%= user.getUserId() %>')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.performance-card').innerHTML = `
+                    <h2>My Performance</h2>
+                    <h3>On-Time Arrival Rate: \${Number(data.onTimeRate).toFixed(2)}%</h3>
+                    <h3>Efficiency Score: \${Number(data.efficiencyScore).toFixed(2)}%</h3>
+                `;
+            })
+            .catch(err => {
+                console.error("Failed to fetch performance data", err);
+                document.querySelector('.performance-card').innerHTML = `
+                    <h2>Performance Unavailable</h2>
+                    <p>Could not load your data. Please try again later.</p>
+                `;
+            });
+    });
     </script>
 
     <% } else { %>
